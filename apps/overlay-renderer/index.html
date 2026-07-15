@@ -232,65 +232,76 @@ html, body {
 
 <script>
 // ============================================================
-// GB Input Display — Browser Source Renderer (Prototype v0)
+// GB Input Display — Browser Source Renderer v0.2
 // ============================================================
 
-const state = {
-  up: false, down: false, left: false, right: false,
-  a: false, b: false, start: false, select: false,
-  l: false, r: false,
-};
+// Action state for GB buttons (l/r are GBA-only, hidden in GB theme)
+const ACTIONS = ['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select'];
+const state = Object.fromEntries(ACTIONS.map(a => [a, false]));
 
-// === Status Indicator ===
+// === Status Indicator (persists when disconnected) ===
 const statusEl = document.getElementById('status');
+let statusPersistent = false;
 
-function setStatus(msg, isError = false) {
+function setStatus(msg, isError = false, persistent = false) {
   statusEl.textContent = msg;
   statusEl.classList.add('visible');
   statusEl.classList.toggle('error', isError);
-  setTimeout(() => statusEl.classList.remove('visible'), 3000);
+  statusPersistent = persistent;
+  if (!persistent) {
+    setTimeout(() => { if (!statusPersistent) statusEl.classList.remove('visible'); }, 3000);
+  }
 }
 
-// === DOM References ===
+// === DOM References + Validation ===
 const buttonEls = {};
+for (const action of ACTIONS) buttonEls[action] = [];
 document.querySelectorAll('[data-action]').forEach(el => {
   const action = el.dataset.action;
-  if (!buttonEls[action]) buttonEls[action] = [];
-  buttonEls[action].push(el);
+  if (buttonEls[action]) buttonEls[action].push(el);
 });
+const missingActions = ACTIONS.filter(a => buttonEls[a].length === 0);
+if (missingActions.length > 0) {
+  console.warn('GB Input Display: missing SVG elements for actions:', missingActions.join(', '));
+}
+if (Object.values(buttonEls).every(arr => arr.length === 0)) {
+  setStatus('no theme elements found — check SVG markup', true, true);
+}
 
 // === Render Loop ===
 function render() {
   for (const [action, pressed] of Object.entries(state)) {
     const els = buttonEls[action];
-    if (els) {
-      els.forEach(el => el.classList.toggle('pressed', pressed));
-    }
+    if (els) els.forEach(el => el.classList.toggle('pressed', pressed));
   }
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
 
-// === Keyboard Mapping (standalone test mode) ===
+// === Keyboard Mapping ===
 const KEY_MAP = {
   'ArrowUp': 'up', 'KeyW': 'up',
   'ArrowDown': 'down', 'KeyS': 'down',
   'ArrowLeft': 'left', 'KeyA': 'left',
   'ArrowRight': 'right', 'KeyD': 'right',
-  'KeyX': 'a',
-  'KeyZ': 'b',
+  'KeyX': 'a', 'KeyZ': 'b',
   'Enter': 'start',
   'ShiftRight': 'select', 'Backspace': 'select',
 };
 
 // === Input Overlay WebSocket Client ===
-const WS_URL = 'ws://localhost:16899';
+const urlParams = new URLSearchParams(window.location.search);
+const WS_URL = urlParams.get('ws') || 'ws://localhost:16899';
 let ws = null;
 let wsReconnectTimer = null;
 let wsConnected = false;
+let reconnectDelay = 2000;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_DELAY = 60000;
+const MAX_RECONNECT_ATTEMPTS = 30;
 
 function connectWebSocket() {
-  if (ws && ws.readyState === WebSocket.OPEN) return;
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
   
   try {
     ws = new WebSocket(WS_URL);
@@ -301,98 +312,89 @@ function connectWebSocket() {
 
   ws.onopen = () => {
     wsConnected = true;
+    reconnectDelay = 2000;
+    reconnectAttempts = 0;
     setStatus('● connected');
   };
 
   ws.onmessage = (evt) => {
     try {
-      const msg = JSON.parse(evt.data);
-      handleIOMessage(msg);
+      handleIOMessage(JSON.parse(evt.data));
     } catch (e) {
-      // Not JSON or unrecognized format — ignore
+      console.warn('GB Input Display: unparseable WebSocket message');
     }
   };
 
   ws.onclose = () => {
     wsConnected = false;
-    setStatus('disconnected — retrying…', true);
     scheduleReconnect();
     clearAllInputs();
   };
 
-  ws.onerror = () => {
-    // onclose will fire after this
-  };
+  ws.onerror = () => { /* onclose fires after */ };
 }
 
 function scheduleReconnect() {
   if (wsReconnectTimer) return;
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    setStatus('WebSocket unavailable — keyboard only', true, true);
+    return;
+  }
+  reconnectAttempts++;
+  setStatus(`reconnecting (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})…`, true, true);
   wsReconnectTimer = setTimeout(() => {
     wsReconnectTimer = null;
     connectWebSocket();
-  }, 2000);
+  }, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT_DELAY);
 }
 
 // === Input Overlay Message Handler ===
-// The plugin sends JSON with:
-//   gamepad events: { gamepad: true, buttons: [...], axes: [...], dpad: [...], id: N }
-//   keyboard events: { keyboard: true, keys: [...] } or key up/down events
 function handleIOMessage(msg) {
   if (msg.keyboard && msg.keys) {
-    // Keyboard state snapshot
     handleKeyboardState(msg.keys);
   } else if (msg.gamepad !== undefined && msg.buttons) {
     handleGamepadState(msg.buttons, msg.axes, msg.dpad);
   } else if (msg.keyCode !== undefined) {
-    // Single key event
     handleKeyEvent(msg);
   }
 }
 
 function handleKeyboardState(keys) {
-  // Reset keyboard-mapped actions
   const kbActions = new Set();
   for (const key of keys) {
     const action = KEY_MAP[key.code || key];
     if (action) kbActions.add(action);
   }
-  // Set state based on what's currently held
-  for (const action of Object.keys(KEY_MAP).map(k => KEY_MAP[k])) {
-    if (action) state[action] = kbActions.has(action);
+  for (const action of ACTIONS) {
+    state[action] = kbActions.has(action);
   }
 }
 
+// Helper: treat any truthy value or number > 0.5 as pressed
+function isPressed(val) {
+  if (typeof val === 'number') return val > 0.5;
+  return !!val;
+}
+
 function handleGamepadState(buttons, axes, dpad) {
-  // Map gamepad buttons to Game Boy actions
-  // Standard XInput mapping for SNES-style / 8BitDo controllers:
-  // Button 0 = A (face bottom) → Game Boy B (left face button)
-  // Button 1 = B (face right) → Game Boy A (right face button)
-  // Button 8 = Select, Button 9 = Start
-  
   if (dpad) {
-    state.up = dpad[0] === 1;
-    state.down = dpad[1] === 1;
-    state.left = dpad[2] === 1;
-    state.right = dpad[3] === 1;
+    state.up = isPressed(dpad[0]);
+    state.down = isPressed(dpad[1]);
+    state.left = isPressed(dpad[2]);
+    state.right = isPressed(dpad[3]);
   }
   
   if (buttons) {
-    // Face buttons (XInput: 0=A bottom, 1=B right, 2=X left, 3=Y top)
-    state.b = buttons[0] === 1;  // XInput A → GB B
-    state.a = buttons[1] === 1;  // XInput B → GB A
-    
-    // Start/Select
-    state.select = buttons[8] === 1 || buttons[6] === 1;
-    state.start = buttons[9] === 1 || buttons[7] === 1;
-    
-    // Shoulder buttons → GB L/R (GBA only)
-    state.l = buttons[4] === 1;
-    state.r = buttons[5] === 1;
+    state.b = isPressed(buttons[0]);  // XInput A → GB B
+    state.a = isPressed(buttons[1]);  // XInput B → GB A
+    state.select = isPressed(buttons[8]) || isPressed(buttons[6]);
+    state.start = isPressed(buttons[9]) || isPressed(buttons[7]);
   }
   
-  // Analog stick → D-pad (fallback if no hat switch)
+  // Analog stick → D-pad fallback (no hat switch)
   if (axes && !dpad && axes.length >= 2) {
-    const DEADZONE = 0.3;
+    const DEADZONE = 0.5;
     if (!state.up && !state.down) {
       state.up = axes[1] < -DEADZONE;
       state.down = axes[1] > DEADZONE;
@@ -406,44 +408,35 @@ function handleGamepadState(buttons, axes, dpad) {
 
 function handleKeyEvent(msg) {
   const action = KEY_MAP[msg.code];
-  if (action) {
-    state[action] = msg.state === 'down' || msg.pressed === true;
-  }
+  if (action) state[action] = msg.state === 'down' || msg.pressed === true;
 }
 
 function clearAllInputs() {
-  for (const k of Object.keys(state)) {
-    state[k] = false;
-  }
+  for (const k of Object.keys(state)) state[k] = false;
 }
 
-// === Keyboard Test Mode (fallback when no WebSocket) ===
+// === Keyboard Fallback (only when WebSocket is NOT connected) ===
 document.addEventListener('keydown', (e) => {
+  if (wsConnected) return;
   const action = KEY_MAP[e.code];
-  if (action) {
-    e.preventDefault();
-    state[action] = true;
-  }
+  if (action) { e.preventDefault(); state[action] = true; }
 });
 
 document.addEventListener('keyup', (e) => {
+  if (wsConnected) return;
   const action = KEY_MAP[e.code];
-  if (action) {
-    e.preventDefault();
-    state[action] = false;
-  }
+  if (action) { e.preventDefault(); state[action] = false; }
 });
 
 // === Boot ===
-// Try WebSocket first; keyboard fallback works regardless
 connectWebSocket();
 
-// Show test mode indicator if WS fails to connect within 2s
+// Show keyboard-only status if WebSocket doesn't connect within 5s
 setTimeout(() => {
-  if (!wsConnected) {
-    setStatus('keyboard test mode (no WebSocket)', true);
+  if (!wsConnected && reconnectAttempts === 0) {
+    setStatus('no WebSocket — keyboard only', true, true);
   }
-}, 2000);
+}, 5000);
 </script>
 </body>
 </html>

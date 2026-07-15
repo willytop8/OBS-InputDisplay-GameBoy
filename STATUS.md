@@ -8,39 +8,37 @@
 - [x] OBS Input Overlay plugin ecosystem researched
 - [x] ADR 0001: WebSocket + Browser Source integration (accepted)
 - [x] ADR 0002: Normalized Game Boy action protocol (accepted)
-- [x] Player Silver SVG theme — original vector artwork (412 lines)
-- [x] Browser-source renderer — `apps/overlay-renderer/index.html`
-  - Inline SVG with keyboard test mode + WebSocket client + gamepad mapping
-  - CSS transitions (100ms), 1.5px press depth, brightness dim
-  - Themeable via CSS custom properties
+- [x] Player Silver SVG theme — original vector artwork
+- [x] Browser-source renderer v0.2 — all review fixes applied:
+  - Exponential backoff WebSocket reconnect (2s → 60s cap, 30 max attempts)
+  - Gamepad threshold `isPressed()` helper (analog-safe)
+  - Keyboard handlers gated behind WebSocket state (no race condition)
+  - `?ws=` URL parameter for custom WebSocket host:port
+  - SVG class hierarchy synced between inline + standalone versions
+  - DOM element validation (warns if SVG actions are missing)
+  - Status indicator persists when disconnected
+  - Analog deadzone raised to 0.5
+  - Startup race fixed (5s timeout, tracks attempts)
 - [x] README.md — features, quick start, supported platforms
 - [x] Installation guide — 5-minute setup, troubleshooting, default mappings
-- [x] Distributable package — `releases/gb-input-display-v0.1.0.zip` (13KB)
-- [x] Claude review dispatched (subagent in background)
-
-## In Progress
-
-- [ ] Claude review subagent running
-
-## Blocked
-
-- Real OBS + Input Overlay testing (needs desktop with keyboard/gamepad)
-- Gamepad WebSocket message format verification (need actual plugin output)
+- [x] Distributable package — `releases/gb-input-display-v0.1.0.zip`
+- [x] Claude review (subagent) — 24 findings, 3 CRITICAL, 4 HIGH, 10 MEDIUM, 7 LOW
+- [x] All 3 v1.0 blockers fixed (C1/C2/C3)
+- [x] All 4 HIGH findings fixed (H1/H2/H3/H4)
 
 ## Next Three Actions
 
-1. Integrate Claude review feedback
-2. Recruit 5+ testers for private beta
+1. Re-package v0.2.0 with fixes
+2. Recruit 5+ testers for private beta (real OBS + Input Overlay)
 3. Build DMG (original gray) theme variant
 
-## Known Failing Tests
+## Known Limitations
 
-- None (no test framework set up yet)
+- No automated tests (Vitest/Playwright) — single-file prototype, not monorepo yet
+- `file://` WebSocket may require local HTTP server on some OBS versions (docs updated)
+- No Game Boy Advance L/R button rendering in current theme
+- macOS not supported (Input Overlay plugin is Windows/Linux only)
 
 ## Current Release
 
-- **v0.1.0** — `releases/gb-input-display-v0.1.0.zip` (13KB)
-  - Player Silver theme
-  - 8-button Game Boy overlay
-  - Keyboard + WebSocket + gamepad input
-  - 5-minute setup guide
+- **v0.2.0-dev** (not yet packaged) — review fixes applied

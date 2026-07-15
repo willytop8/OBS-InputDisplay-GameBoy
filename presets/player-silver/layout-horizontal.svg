@@ -95,10 +95,8 @@
         fill: var(--dpad-arrow);
         transition: fill var(--transition-speed) ease;
       }
-      .dpad-body.pressed {
-        transform: translateY(var(--press-y));
-      }
-      .dpad-body.pressed .dpad-surface {
+      .dpad-group.pressed .dpad-surface,
+      .dpad-group.pressed .dpad-arrow {
         fill: var(--dpad-shadow);
       }
 
@@ -128,15 +126,13 @@
         fill: var(--btn-b-surface);
       }
 
-      .btn-a-body.pressed .btn-a-surface,
-      .btn-a-body.pressed {
+      .btn-a-group.pressed .btn-a-surface,
+      .btn-a-group.pressed .btn-a-body {
         fill: var(--btn-a-shadow);
-        transform: translateY(var(--press-y));
       }
-      .btn-b-body.pressed .btn-b-surface,
-      .btn-b-body.pressed {
+      .btn-b-group.pressed .btn-b-surface,
+      .btn-b-group.pressed .btn-b-body {
         fill: var(--btn-b-shadow);
-        transform: translateY(var(--press-y));
       }
 
       /* ── Pill buttons (Start/Select) ── */
@@ -152,10 +148,9 @@
       .pill-surface {
         fill: var(--btn-pill-surface);
       }
-      .pill-body.pressed .pill-surface,
-      .pill-body.pressed {
+      .pill-group.pressed .pill-body,
+      .pill-group.pressed .pill-surface {
         fill: var(--btn-start-shadow);
-        transform: translateY(var(--press-y));
       }
 
       /* ── Labels ── */
@@ -243,16 +238,16 @@
     <use href="#dpad-cross" class="dpad-shadow" transform="translate(1, 2)" opacity="0.35"/>
 
     <!-- D-pad main body + pressed group -->
-    <g class="dpad-body" data-action="up">
+    <g class="dpad-group btn-base" data-action="up">
       <use href="#dpad-cross" class="dpad-body"/>
     </g>
-    <g class="dpad-body" data-action="down">
+    <g class="dpad-group btn-base" data-action="down">
       <use href="#dpad-cross" class="dpad-body"/>
     </g>
-    <g class="dpad-body" data-action="left">
+    <g class="dpad-group btn-base" data-action="left">
       <use href="#dpad-cross" class="dpad-body"/>
     </g>
-    <g class="dpad-body" data-action="right">
+    <g class="dpad-group btn-base" data-action="right">
       <use href="#dpad-cross" class="dpad-body"/>
     </g>
 
@@ -299,7 +294,7 @@
     <rect x="0" y="0" width="36" height="16" rx="8" ry="8"
           fill="var(--btn-start-shadow)" opacity="0.3"
           transform="translate(0, 2)"/>
-    <g class="pill-body" data-action="start">
+    <g class="pill-group btn-base" data-action="start">
       <rect x="0" y="0" width="36" height="16" rx="8" ry="8"
             class="pill-body"/>
       <rect x="2" y="1" width="32" height="6" rx="3"
@@ -314,7 +309,7 @@
     <rect x="0" y="0" width="36" height="16" rx="8" ry="8"
           fill="var(--btn-start-shadow)" opacity="0.3"
           transform="translate(0, 2)"/>
-    <g class="pill-body" data-action="select">
+    <g class="pill-group btn-base" data-action="select">
       <rect x="0" y="0" width="36" height="16" rx="8" ry="8"
             class="pill-body"/>
       <rect x="2" y="1" width="32" height="6" rx="3"
@@ -339,7 +334,7 @@
     <circle cx="26" cy="26" r="22"
             fill="var(--btn-b-shadow)" opacity="0.2"
             transform="translate(0, 2)"/>
-    <g class="btn-b-body" data-action="b">
+    <g class="btn-b-group btn-base" data-action="b">
       <!-- Outer ring / bezel -->
       <circle cx="26" cy="26" r="22"
               class="btn-b-body"/>
@@ -365,7 +360,7 @@
     <circle cx="26" cy="26" r="22"
             fill="var(--btn-a-shadow)" opacity="0.2"
             transform="translate(0, 2)"/>
-    <g class="btn-a-body" data-action="a">
+    <g class="btn-a-group btn-base" data-action="a">
       <!-- Outer ring / bezel -->
       <circle cx="26" cy="26" r="22"
               class="btn-a-body"/>
