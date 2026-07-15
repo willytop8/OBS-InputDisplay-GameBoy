@@ -12,7 +12,7 @@ Shows your live Game Boy button inputs (D-pad, A/B, Start/Select) as an overlay 
 
 ## Features
 
-- **Two themes** — Player Silver (Game Boy Player-inspired) & Minimal (buttons only, transparent)
+- **Three themes** — DMG (original gray), Player Silver (Game Boy Player), Minimal (buttons only)
 - **Instant feedback** — CSS transitions, 50ms press / 120ms release, 1.5px depth
 - **Keyboard + gamepad** — both first-class, both simultaneously
 - **Transparent background** — drop it anywhere in your OBS layout
@@ -61,7 +61,7 @@ docs/                    # Installation, architecture, research
 
 ## Roadmap
 
-- **v1.0** — Player Silver + Minimal themes, all 8 buttons, keyboard + gamepad, setup guide
+- **v1.0** — DMG + Player Silver + Minimal themes, all 8 buttons, keyboard + gamepad, setup guide
 - **v1.1** — DMG (original gray) theme, Compact/GBC/Atomic Purple variants
 - **v1.2** — Press animations polish, optional sounds, hover effects
 - **v1.3** — Theme creation guide, community template, theme sharing

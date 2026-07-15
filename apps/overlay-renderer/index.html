@@ -38,6 +38,17 @@ html, body {
 }
 .status.visible { opacity: 1; }
 .status.error { color: rgba(255,100,100,0.6); }
+
+/* === Accessibility === */
+@media (prefers-reduced-motion: reduce) {
+  .btn-base, .btn-base.pressed,
+  .dpad-body, .dpad-surface, .dpad-arrow,
+  .pill-body, .pill-surface,
+  .btn-a-body, .btn-a-surface, .btn-b-body, .btn-b-surface {
+    transition: none !important;
+  }
+  .btn-base.pressed { transform: none; filter: none; }
+}
 </style>
 </head>
 <body>
@@ -299,6 +310,104 @@ html, body {
         <circle cx="26" cy="26" r="14" fill="var(--btn-a-surface)" opacity="0.08"/>
       </g>
     </g>
+  </svg>
+
+  <!-- ═══ DMG THEME (original gray Game Boy) ═══ -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200" class="theme-dmg" style="display:none;max-width:100%;height:auto;">
+    <style>
+      /* DMG color overrides — warm gray shell, magenta buttons */
+      .theme-dmg .dpad-body { fill: #3a3530; }
+      .theme-dmg .dpad-surface { fill: #4a4540; }
+      .theme-dmg .dpad-arrow { fill: #6e6860; }
+      .theme-dmg .dpad-shadow { fill: #2a2520; }
+      .theme-dmg .btn-a-body { fill: #8b2252; }
+      .theme-dmg .btn-a-highlight { stroke: #b8356e; }
+      .theme-dmg .btn-a-shadow { fill: #5a1530; }
+      .theme-dmg .btn-a-surface { fill: #a03060; }
+      .theme-dmg .btn-b-body { fill: #8b2252; }
+      .theme-dmg .btn-b-highlight { stroke: #b8356e; }
+      .theme-dmg .btn-b-shadow { fill: #5a1530; }
+      .theme-dmg .btn-b-surface { fill: #a03060; }
+      .theme-dmg .pill-body { fill: #5a5550; }
+      .theme-dmg .pill-highlight { fill: #7a7570; }
+      .theme-dmg .pill-surface { fill: #6a6560; }
+      .theme-dmg .btn-a-group.pressed .btn-a-body { fill: #5a1530; }
+      .theme-dmg .btn-b-group.pressed .btn-b-body { fill: #5a1530; }
+      .theme-dmg .pill-group.pressed .pill-body { fill: #3a3530; }
+    </style>
+
+    <!-- ═══ FACEPLATE — Classic DMG warm gray ═══ -->
+    <rect x="4" y="6" width="632" height="188" rx="24" ry="24" fill="url(#faceplate-grad)" opacity="0.9"/>
+    <rect x="4" y="6" width="632" height="188" rx="24" ry="24" fill="none" stroke="#c8c4bc" stroke-width="0.8" opacity="0.3"/>
+
+    <!-- Subtle panel lines like classic DMG -->
+    <line x1="30" y1="145" x2="610" y2="145" stroke="#c0bcb4" stroke-width="1" opacity="0.4"/>
+    <line x1="30" y1="146" x2="610" y2="146" stroke="#e0dcd4" stroke-width="1" opacity="0.3"/>
+
+    <!-- Screen bezel area (upper portion) — subtle indentation hint -->
+    <rect x="80" y="22" width="260" height="115" rx="8" fill="#b8b4ac" opacity="0.15"/>
+    <rect x="85" y="27" width="250" height="105" rx="6" fill="#c8c4bc" opacity="0.3"/>
+
+    <!-- Screen lens frame -->
+    <rect x="92" y="34" width="236" height="90" rx="4" fill="#4a4844" opacity="0.5"/>
+    <text x="210" y="82" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8px" font-weight="700" letter-spacing="2px" fill="#7a7874" opacity="0.3" text-anchor="middle">DOT MATRIX WITH STEREO SOUND</text>
+
+    <!-- ═══ D-PAD (LEFT, below screen) ═══ -->
+    <g transform="translate(100, 132)" class="btn-base">
+      <use href="#dpad-cross" class="dpad-shadow" transform="translate(1, 2)" opacity="0.3"/>
+      <g class="dpad-group btn-base" data-action="up"><use href="#dpad-cross" class="dpad-body"/></g>
+      <g class="dpad-group btn-base" data-action="down"><use href="#dpad-cross" class="dpad-body"/></g>
+      <g class="dpad-group btn-base" data-action="left"><use href="#dpad-cross" class="dpad-body"/></g>
+      <g class="dpad-group btn-base" data-action="right"><use href="#dpad-cross" class="dpad-body"/></g>
+      <circle cx="50" cy="50" r="10" fill="var(--dpad-bg)"/>
+      <rect x="32" y="40" width="36" height="20" rx="2" fill="var(--dpad-surface)" opacity="0.25"/>
+      <rect x="40" y="32" width="20" height="36" rx="2" fill="var(--dpad-surface)" opacity="0.25"/>
+      <polygon points="50,34 46,40 54,40" class="dpad-arrow" opacity="0.4"/>
+      <polygon points="50,66 46,60 54,60" class="dpad-arrow" opacity="0.4"/>
+      <polygon points="34,50 40,46 40,54" class="dpad-arrow" opacity="0.4"/>
+      <polygon points="66,50 60,46 60,54" class="dpad-arrow" opacity="0.4"/>
+    </g>
+
+    <!-- ═══ START + SELECT (center, angled) ═══ -->
+    <g transform="translate(255, 135)" class="btn-base">
+      <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#5a5550" opacity="0.3" transform="translate(0, 2) rotate(-25, 20, 6)"/>
+      <g class="pill-group btn-base" data-action="select">
+        <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" class="pill-body"/>
+        <rect x="2" y="1" width="36" height="5" rx="2.5" transform="rotate(-25, 20, 6)" class="pill-highlight" opacity="0.25"/>
+      </g>
+    </g>
+    <g transform="translate(320, 135)" class="btn-base">
+      <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#5a5550" opacity="0.3"/>
+      <g class="pill-group btn-base" data-action="start">
+        <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" class="pill-body"/>
+        <rect x="2" y="1" width="36" height="5" rx="2.5" transform="rotate(-25, 20, 6)" class="pill-highlight" opacity="0.25"/>
+      </g>
+    </g>
+
+    <!-- ═══ B + A (RIGHT) — classic magenta/maroon ═══ -->
+    <g transform="translate(450, 128)" class="btn-base">
+      <circle cx="26" cy="26" r="22" fill="#5a1530" opacity="0.2" transform="translate(0, 2)"/>
+      <g class="btn-b-group btn-base" data-action="b">
+        <circle cx="26" cy="26" r="22" class="btn-b-body"/>
+        <circle cx="26" cy="26" r="20" fill="#5a1530" opacity="0.12"/>
+        <path d="M 10,14 A 20,20 0 0,1 42,14" class="btn-b-highlight" opacity="0.3" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="24" cy="20" rx="10" ry="6" class="btn-b-surface" opacity="0.1"/>
+      </g>
+      <text x="26" y="56" class="label" font-size="8px">B</text>
+    </g>
+    <g transform="translate(510, 128)" class="btn-base">
+      <circle cx="26" cy="26" r="22" fill="#5a1530" opacity="0.2" transform="translate(0, 2)"/>
+      <g class="btn-a-group btn-base" data-action="a">
+        <circle cx="26" cy="26" r="22" class="btn-a-body"/>
+        <circle cx="26" cy="26" r="20" fill="#5a1530" opacity="0.1"/>
+        <path d="M 10,14 A 20,20 0 0,1 42,14" class="btn-a-highlight" opacity="0.35" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="24" cy="20" rx="10" ry="6" class="btn-a-surface" opacity="0.12"/>
+      </g>
+      <text x="26" y="56" class="label" font-size="8px">A</text>
+    </g>
+
+    <!-- D-pad label -->
+    <text x="150" y="197" class="label" font-size="7px" opacity="0.4">CONTROL PAD</text>
   </svg>
 </div>
 

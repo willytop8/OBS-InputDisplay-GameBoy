@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200">
+  <defs>
+    <linearGradient id="faceplate-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dcd8d0"/>
+      <stop offset="50%" stop-color="#d0ccc4"/>
+      <stop offset="100%" stop-color="#dcd8d0"/>
+    </linearGradient>
+    <path id="dpad-cross" d="M 38,28 L 62,28 L 62,38 L 72,38 L 72,62 L 62,62 L 62,72 L 38,72 L 38,62 L 28,62 L 28,38 L 38,38 Z"/>
+  </defs>
+
+  <!-- Faceplate -->
+  <rect x="4" y="6" width="632" height="188" rx="24" fill="url(#faceplate-grad)" opacity="0.9"/>
+  <rect x="4" y="6" width="632" height="188" rx="24" fill="none" stroke="#c8c4bc" stroke-width="0.8" opacity="0.3"/>
+  <line x1="30" y1="145" x2="610" y2="145" stroke="#c0bcb4" stroke-width="1" opacity="0.4"/>
+  <line x1="30" y1="146" x2="610" y2="146" stroke="#e0dcd4" stroke-width="1" opacity="0.3"/>
+
+  <!-- Screen bezel -->
+  <rect x="80" y="22" width="260" height="115" rx="8" fill="#b8b4ac" opacity="0.15"/>
+  <rect x="85" y="27" width="250" height="105" rx="6" fill="#c8c4bc" opacity="0.3"/>
+
+  <!-- Screen lens -->
+  <rect x="92" y="34" width="236" height="90" rx="4" fill="#4a4844" opacity="0.5"/>
+  <text x="210" y="82" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8px" font-weight="700" letter-spacing="2px" fill="#7a7874" opacity="0.3" text-anchor="middle">DOT MATRIX WITH STEREO SOUND</text>
+
+  <!-- D-Pad -->
+  <g transform="translate(100, 132)">
+    <use href="#dpad-cross" fill="#2a2520" transform="translate(1, 2)" opacity="0.3"/>
+    <g data-action="up"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <g data-action="down"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <g data-action="left"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <g data-action="right"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <circle cx="50" cy="50" r="10" fill="#3a3530"/>
+    <rect x="32" y="40" width="36" height="20" rx="2" fill="#4a4540" opacity="0.25"/>
+    <rect x="40" y="32" width="20" height="36" rx="2" fill="#4a4540" opacity="0.25"/>
+    <polygon points="50,34 46,40 54,40" fill="#6e6860" opacity="0.4"/>
+    <polygon points="50,66 46,60 54,60" fill="#6e6860" opacity="0.4"/>
+    <polygon points="34,50 40,46 40,54" fill="#6e6860" opacity="0.4"/>
+    <polygon points="66,50 60,46 60,54" fill="#6e6860" opacity="0.4"/>
+  </g>
+
+  <!-- Select -->
+  <g transform="translate(255, 135)">
+    <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#3a3530" opacity="0.3"/>
+    <g data-action="select">
+      <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#5a5550"/>
+      <rect x="2" y="1" width="36" height="5" rx="2.5" transform="rotate(-25, 20, 6)" fill="#7a7570" opacity="0.25"/>
+    </g>
+  </g>
+
+  <!-- Start -->
+  <g transform="translate(320, 135)">
+    <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#3a3530" opacity="0.3"/>
+    <g data-action="start">
+      <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#5a5550"/>
+      <rect x="2" y="1" width="36" height="5" rx="2.5" transform="rotate(-25, 20, 6)" fill="#7a7570" opacity="0.25"/>
+    </g>
+  </g>
+
+  <!-- B Button -->
+  <g transform="translate(450, 128)">
+    <circle cx="26" cy="26" r="22" fill="#5a1530" opacity="0.2" transform="translate(0, 2)"/>
+    <g data-action="b">
+      <circle cx="26" cy="26" r="22" fill="#8b2252"/>
+      <circle cx="26" cy="26" r="20" fill="#5a1530" opacity="0.12"/>
+      <path d="M 10,14 A 20,20 0 0,1 42,14" fill="none" stroke="#b8356e" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+    </g>
+    <text x="26" y="56" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8px" fill="#7a7874" opacity="0.5" text-anchor="middle" font-weight="600">B</text>
+  </g>
+
+  <!-- A Button -->
+  <g transform="translate(510, 128)">
+    <circle cx="26" cy="26" r="22" fill="#5a1530" opacity="0.2" transform="translate(0, 2)"/>
+    <g data-action="a">
+      <circle cx="26" cy="26" r="22" fill="#8b2252"/>
+      <circle cx="26" cy="26" r="20" fill="#5a1530" opacity="0.1"/>
+      <path d="M 10,14 A 20,20 0 0,1 42,14" fill="none" stroke="#b8356e" stroke-width="3" opacity="0.35" stroke-linecap="round"/>
+    </g>
+    <text x="26" y="56" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8px" fill="#7a7874" opacity="0.5" text-anchor="middle" font-weight="600">A</text>
+  </g>
+
+  <text x="150" y="197" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7px" fill="#7a7874" opacity="0.4" text-anchor="middle">CONTROL PAD</text>
+</svg>
