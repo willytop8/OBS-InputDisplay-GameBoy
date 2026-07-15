@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GB Input Display</title>
+<style>
+/* === Reset & Base === */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* === CSS Custom Properties (themeable) === */
+:root {
+  --faceplate-bg: #c8c4bd;
+  --faceplate-border: #a8a49d;
+  --faceplate-highlight: #e0dcd5;
+  --faceplate-shadow: #98948d;
+  --dpad-color: #3a3a3e;
+  --dpad-pressed: #2a2a2e;
+  --dpad-highlight: #5a5a5e;
+  --btn-a-color: #6b4c8a;
+  --btn-a-pressed: #5a3d75;
+  --btn-b-color: #6b4c8a;
+  --btn-b-pressed: #5a3d75;
+  --btn-start-color: #7a7a80;
+  --btn-start-pressed: #5a5a60;
+  --btn-select-color: #7a7a80;
+  --btn-select-pressed: #5a5a60;
+  --label-color: #5a5650;
+  --gap: 16px;
+}
+
+/* === Overlay Container === */
+.overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+}
+
+.faceplate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, var(--faceplate-highlight) 0%, var(--faceplate-bg) 30%, var(--faceplate-bg) 70%, var(--faceplate-shadow) 100%);
+  border-radius: 12px;
+  padding: 12px 20px;
+  gap: 8px;
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  /* Panel seam effect */
+  position: relative;
+  outline: 1px solid var(--faceplate-border);
+  outline-offset: -1px;
+}
+
+/* === D-Pad Section === */
+.dpad-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dpad {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.dpad-btn {
+  position: absolute;
+  background: var(--dpad-color);
+  border: none;
+  cursor: default;
+  transition: background 0.06s ease-out, transform 0.06s ease-out, box-shadow 0.06s ease-out;
+  border-radius: 4px;
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.dpad-btn.pressed {
+  box-shadow: 
+    0 0px 1px rgba(0,0,0,0.5),
+    inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* D-pad horizontal bar */
+.dpad-horizontal {
+  top: 24px;
+  left: 8px;
+  width: 56px;
+  height: 24px;
+}
+.dpad-horizontal.pressed { background: var(--dpad-pressed); }
+
+/* D-pad vertical bar */
+.dpad-vertical {
+  top: 8px;
+  left: 24px;
+  width: 24px;
+  height: 56px;
+}
+.dpad-vertical.pressed { background: var(--dpad-pressed); }
+
+/* Individual press visual feedback */
+.dpad-btn[data-action="up"].pressed { transform: translateY(-1px); }
+.dpad-btn[data-action="down"].pressed { transform: translateY(1px); }
+.dpad-btn[data-action="left"].pressed { transform: translateX(-1px); }
+.dpad-btn[data-action="right"].pressed { transform: translateX(1px); }
+
+/* D-pad center cap */
+.dpad-center {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--dpad-color);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* === Center Section: Start + Select === */
+.center-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pill-btn {
+  width: 40px;
+  height: 14px;
+  border-radius: 7px;
+  border: none;
+  cursor: default;
+  transition: background 0.06s ease-out, transform 0.06s ease-out, box-shadow 0.06s ease-out;
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.pill-btn[data-action="start"] { background: var(--btn-start-color); }
+.pill-btn[data-action="select"] { background: var(--btn-select-color); }
+
+.pill-btn.pressed {
+  transform: translateY(1px);
+  box-shadow: 
+    0 0px 1px rgba(0,0,0,0.4),
+    inset 0 2px 3px rgba(0,0,0,0.3);
+}
+.pill-btn[data-action="start"].pressed { background: var(--btn-start-pressed); }
+.pill-btn[data-action="select"].pressed { background: var(--btn-select-pressed); }
+
+.pill-label {
+  font-size: 8px;
+  color: var(--label-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+/* === Face Button Section (B + A) === */
+.face-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.face-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: default;
+  transition: background 0.06s ease-out, transform 0.06s ease-out, box-shadow 0.06s ease-out;
+  box-shadow: 
+    0 3px 6px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  position: relative;
+}
+
+.face-btn::after {
+  content: attr(data-label);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+
+.face-btn[data-action="b"] { background: var(--btn-b-color); }
+.face-btn[data-action="a"] { background: var(--btn-a-color); }
+
+.face-btn.pressed {
+  transform: translateY(2px);
+  box-shadow: 
+    0 0px 2px rgba(0,0,0,0.4),
+    inset 0 3px 6px rgba(0,0,0,0.25);
+}
+.face-btn[data-action="b"].pressed { background: var(--btn-b-pressed); }
+.face-btn[data-action="a"].pressed { background: var(--btn-a-pressed); }
+
+/* === Compact Layout === */
+.faceplate.compact {
+  padding: 8px 14px;
+  gap: 6px;
+}
+.faceplate.compact .dpad { width: 56px; height: 56px; }
+.faceplate.compact .dpad-horizontal { top: 18px; left: 5px; width: 46px; height: 20px; }
+.faceplate.compact .dpad-vertical { top: 5px; left: 18px; width: 20px; height: 46px; }
+.faceplate.compact .dpad-center { top: 22px; left: 22px; width: 12px; height: 12px; }
+.faceplate.compact .face-btn { width: 26px; height: 26px; }
+.faceplate.compact .face-btn::after { font-size: 10px; }
+.faceplate.compact .pill-btn { width: 32px; height: 12px; }
+.faceplate.compact .pill-label { font-size: 7px; }
+
+/* === Status indicator === */
+.status {
+  position: fixed;
+  bottom: 4px;
+  right: 8px;
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  font-family: monospace;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.status.visible { opacity: 1; }
+.status.error { color: rgba(255,100,100,0.6); }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="faceplate" id="faceplate">
+
+    <!-- D-Pad -->
+    <div class="dpad-section">
+      <div class="dpad">
+        <div class="dpad-btn dpad-vertical" data-action="up"></div>
+        <div class="dpad-btn dpad-vertical" data-action="down" style="top:48px"></div>
+        <div class="dpad-btn dpad-horizontal" data-action="left"></div>
+        <div class="dpad-btn dpad-horizontal" data-action="right" style="left:48px"></div>
+        <div class="dpad-center"></div>
+      </div>
+    </div>
+
+    <!-- Start + Select -->
+    <div class="center-section">
+      <div class="pill-btn" data-action="select"></div>
+      <div class="pill-label">select</div>
+      <div class="pill-btn" data-action="start" style="margin-top:4px"></div>
+      <div class="pill-label">start</div>
+    </div>
+
+    <!-- B + A -->
+    <div class="face-buttons">
+      <div class="face-btn" data-action="b" data-label="B"></div>
+      <div class="face-btn" data-action="a" data-label="A"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="status" id="status">● connected</div>
+
+<script>
+// ============================================================
+// GB Input Display — Browser Source Renderer (Prototype v0)
+// ============================================================
+
+const state = {
+  up: false, down: false, left: false, right: false,
+  a: false, b: false, start: false, select: false,
+  l: false, r: false,
+};
+
+// === Status Indicator ===
+const statusEl = document.getElementById('status');
+
+function setStatus(msg, isError = false) {
+  statusEl.textContent = msg;
+  statusEl.classList.add('visible');
+  statusEl.classList.toggle('error', isError);
+  setTimeout(() => statusEl.classList.remove('visible'), 3000);
+}
+
+// === DOM References ===
+const buttonEls = {};
+document.querySelectorAll('[data-action]').forEach(el => {
+  const action = el.dataset.action;
+  if (!buttonEls[action]) buttonEls[action] = [];
+  buttonEls[action].push(el);
+});
+
+// === Render Loop ===
+function render() {
+  for (const [action, pressed] of Object.entries(state)) {
+    const els = buttonEls[action];
+    if (els) {
+      els.forEach(el => el.classList.toggle('pressed', pressed));
+    }
+  }
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+// === Keyboard Mapping (standalone test mode) ===
+const KEY_MAP = {
+  'ArrowUp': 'up', 'KeyW': 'up',
+  'ArrowDown': 'down', 'KeyS': 'down',
+  'ArrowLeft': 'left', 'KeyA': 'left',
+  'ArrowRight': 'right', 'KeyD': 'right',
+  'KeyX': 'a',
+  'KeyZ': 'b',
+  'Enter': 'start',
+  'ShiftRight': 'select', 'Backspace': 'select',
+};
+
+// === Input Overlay WebSocket Client ===
+const WS_URL = 'ws://localhost:16899';
+let ws = null;
+let wsReconnectTimer = null;
+let wsConnected = false;
+
+function connectWebSocket() {
+  if (ws && ws.readyState === WebSocket.OPEN) return;
+  
+  try {
+    ws = new WebSocket(WS_URL);
+  } catch (e) {
+    scheduleReconnect();
+    return;
+  }
+
+  ws.onopen = () => {
+    wsConnected = true;
+    setStatus('● connected');
+  };
+
+  ws.onmessage = (evt) => {
+    try {
+      const msg = JSON.parse(evt.data);
+      handleIOMessage(msg);
+    } catch (e) {
+      // Not JSON or unrecognized format — ignore
+    }
+  };
+
+  ws.onclose = () => {
+    wsConnected = false;
+    setStatus('disconnected — retrying…', true);
+    scheduleReconnect();
+    clearAllInputs();
+  };
+
+  ws.onerror = () => {
+    // onclose will fire after this
+  };
+}
+
+function scheduleReconnect() {
+  if (wsReconnectTimer) return;
+  wsReconnectTimer = setTimeout(() => {
+    wsReconnectTimer = null;
+    connectWebSocket();
+  }, 2000);
+}
+
+// === Input Overlay Message Handler ===
+// The plugin sends JSON with:
+//   gamepad events: { gamepad: true, buttons: [...], axes: [...], dpad: [...], id: N }
+//   keyboard events: { keyboard: true, keys: [...] } or key up/down events
+function handleIOMessage(msg) {
+  if (msg.keyboard && msg.keys) {
+    // Keyboard state snapshot
+    handleKeyboardState(msg.keys);
+  } else if (msg.gamepad !== undefined && msg.buttons) {
+    handleGamepadState(msg.buttons, msg.axes, msg.dpad);
+  } else if (msg.keyCode !== undefined) {
+    // Single key event
+    handleKeyEvent(msg);
+  }
+}
+
+function handleKeyboardState(keys) {
+  // Reset keyboard-mapped actions
+  const kbActions = new Set();
+  for (const key of keys) {
+    const action = KEY_MAP[key.code || key];
+    if (action) kbActions.add(action);
+  }
+  // Set state based on what's currently held
+  for (const action of Object.keys(KEY_MAP).map(k => KEY_MAP[k])) {
+    if (action) state[action] = kbActions.has(action);
+  }
+}
+
+function handleGamepadState(buttons, axes, dpad) {
+  // Map gamepad buttons to Game Boy actions
+  // Standard XInput mapping for SNES-style / 8BitDo controllers:
+  // Button 0 = A (face bottom) → Game Boy B (left face button)
+  // Button 1 = B (face right) → Game Boy A (right face button)
+  // Button 8 = Select, Button 9 = Start
+  
+  if (dpad) {
+    state.up = dpad[0] === 1;
+    state.down = dpad[1] === 1;
+    state.left = dpad[2] === 1;
+    state.right = dpad[3] === 1;
+  }
+  
+  if (buttons) {
+    // Face buttons (XInput: 0=A bottom, 1=B right, 2=X left, 3=Y top)
+    state.b = buttons[0] === 1;  // XInput A → GB B
+    state.a = buttons[1] === 1;  // XInput B → GB A
+    
+    // Start/Select
+    state.select = buttons[8] === 1 || buttons[6] === 1;
+    state.start = buttons[9] === 1 || buttons[7] === 1;
+    
+    // Shoulder buttons → GB L/R (GBA only)
+    state.l = buttons[4] === 1;
+    state.r = buttons[5] === 1;
+  }
+  
+  // Analog stick → D-pad (fallback if no hat switch)
+  if (axes && !dpad && axes.length >= 2) {
+    const DEADZONE = 0.3;
+    if (!state.up && !state.down) {
+      state.up = axes[1] < -DEADZONE;
+      state.down = axes[1] > DEADZONE;
+    }
+    if (!state.left && !state.right) {
+      state.left = axes[0] < -DEADZONE;
+      state.right = axes[0] > DEADZONE;
+    }
+  }
+}
+
+function handleKeyEvent(msg) {
+  const action = KEY_MAP[msg.code];
+  if (action) {
+    state[action] = msg.state === 'down' || msg.pressed === true;
+  }
+}
+
+function clearAllInputs() {
+  for (const k of Object.keys(state)) {
+    state[k] = false;
+  }
+}
+
+// === Keyboard Test Mode (fallback when no WebSocket) ===
+document.addEventListener('keydown', (e) => {
+  const action = KEY_MAP[e.code];
+  if (action) {
+    e.preventDefault();
+    state[action] = true;
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  const action = KEY_MAP[e.code];
+  if (action) {
+    e.preventDefault();
+    state[action] = false;
+  }
+});
+
+// === Boot ===
+// Try WebSocket first; keyboard fallback works regardless
+connectWebSocket();
+
+// Show test mode indicator if WS fails to connect within 2s
+setTimeout(() => {
+  if (!wsConnected) {
+    setStatus('keyboard test mode (no WebSocket)', true);
+  }
+}, 2000);
+</script>
+</body>
+</html>
