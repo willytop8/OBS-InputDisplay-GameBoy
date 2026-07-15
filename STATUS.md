@@ -1,43 +1,46 @@
 # GB Input Display — Current Status
 
-**Last updated:** 2026-07-11
+**Last updated:** 2026-07-15
 
 ## Completed
 
-- [x] Repository created and scaffolded
-- [x] AGENTS.md, PROJECT.md, STATUS.md, TASKS.md, DECISIONS.md created
-- [x] OBS Input Overlay plugin researched (architecture, WebSocket protocol, preset format)
-- [x] ADR 0001: Integration route — WebSocket + Browser Source (accepted)
-- [x] ADR 0002: Normalized action protocol (accepted)
-- [x] Research doc: OBS Input Overlay ecosystem
-- [x] Functional prototype: `apps/overlay-renderer/index.html`
-  - 8-button Game Boy layout (D-pad, A/B, Start/Select)
-  - CSS transitions for press/release
-  - Keyboard test mode (always works)
-  - WebSocket client for Input Overlay (auto-connects)
-  - Gamepad state handling via WebSocket
-  - Compact layout via `.compact` class
+- [x] Repository scaffolded (AGENTS.md, PROJECT.md, STATUS.md, TASKS.md, LICENSE)
+- [x] OBS Input Overlay plugin ecosystem researched
+- [x] ADR 0001: WebSocket + Browser Source integration (accepted)
+- [x] ADR 0002: Normalized Game Boy action protocol (accepted)
+- [x] Player Silver SVG theme — original vector artwork (412 lines)
+- [x] Browser-source renderer — `apps/overlay-renderer/index.html`
+  - Inline SVG with keyboard test mode + WebSocket client + gamepad mapping
+  - CSS transitions (100ms), 1.5px press depth, brightness dim
   - Themeable via CSS custom properties
+- [x] README.md — features, quick start, supported platforms
+- [x] Installation guide — 5-minute setup, troubleshooting, default mappings
+- [x] Distributable package — `releases/gb-input-display-v0.1.0.zip` (13KB)
+- [x] Claude review dispatched (subagent in background)
 
 ## In Progress
 
-- [ ] Visual subagent: creating SVG theme assets
-- [ ] Testing with actual Input Overlay plugin WebSocket output
+- [ ] Claude review subagent running
 
 ## Blocked
 
-- None
+- Real OBS + Input Overlay testing (needs desktop with keyboard/gamepad)
+- Gamepad WebSocket message format verification (need actual plugin output)
 
 ## Next Three Actions
 
-1. Wait for visual subagent to complete SVG assets
-2. Test prototype against real Input Overlay WebSocket output
-3. Create packaged preset archive with setup instructions
+1. Integrate Claude review feedback
+2. Recruit 5+ testers for private beta
+3. Build DMG (original gray) theme variant
 
 ## Known Failing Tests
 
-- None yet (no test framework set up)
+- None (no test framework set up yet)
 
-## Current Release Target
+## Current Release
 
-- Milestone 1: Static visual prototype (80% done — functional layout exists, needs vector artwork upgrade)
+- **v0.1.0** — `releases/gb-input-display-v0.1.0.zip` (13KB)
+  - Player Silver theme
+  - 8-button Game Boy overlay
+  - Keyboard + WebSocket + gamepad input
+  - 5-minute setup guide
