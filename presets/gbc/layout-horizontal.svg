@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 170" width="580" height="170">
+  <defs>
+    <path id="dpad-cross" d="M 38,28 L 62,28 L 62,38 L 72,38 L 72,62 L 62,62 L 62,72 L 38,72 L 38,62 L 28,62 L 28,38 L 38,38 Z"/>
+  </defs>
+
+  <!-- Translucent purple shell -->
+  <rect x="4" y="4" width="572" height="162" rx="18" fill="#7b3fa3" opacity="0.75"/>
+  <rect x="4" y="4" width="572" height="162" rx="18" fill="none" stroke="#9b5fc3" stroke-width="1" opacity="0.5"/>
+
+  <!-- Inner PCB visible through translucent shell -->
+  <rect x="24" y="14" width="200" height="100" rx="6" fill="#4a1a6b" opacity="0.3"/>
+  <rect x="260" y="14" width="296" height="100" rx="6" fill="#4a1a6b" opacity="0.15"/>
+
+  <!-- Screen -->
+  <rect x="30" y="20" width="188" height="88" rx="4" fill="#2a1a3b" opacity="0.6"/>
+  <rect x="34" y="24" width="180" height="80" rx="3" fill="#1a0a2b" opacity="0.4"/>
+  <text x="124" y="68" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7px" font-weight="700" letter-spacing="1.5px" fill="#7b5fa3" opacity="0.4" text-anchor="middle">GAME BOY</text>
+  <text x="124" y="78" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="6px" letter-spacing="1px" fill="#9b7fc3" opacity="0.3" text-anchor="middle">COLOR</text>
+
+  <!-- IR port -->
+  <rect x="480" y="2" width="40" height="6" rx="3" fill="#6b3093" opacity="0.6"/>
+
+  <!-- D-Pad -->
+  <g transform="translate(60, 112)">
+    <use href="#dpad-cross" fill="#2a2520" transform="translate(1, 2)" opacity="0.3"/>
+    <g data-action="up"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <g data-action="down"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <g data-action="left"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <g data-action="right"><use href="#dpad-cross" fill="#3a3530"/></g>
+    <circle cx="50" cy="50" r="10" fill="#3a3530"/>
+  </g>
+
+  <!-- Select -->
+  <g transform="translate(250, 118)">
+    <rect x="0" y="0" width="36" height="12" rx="6" fill="#3a3530" opacity="0.3"/>
+    <g data-action="select">
+      <rect x="0" y="0" width="36" height="12" rx="6" fill="#5a5550"/>
+      <rect x="2" y="1" width="32" height="4" rx="2" fill="#7a7570" opacity="0.25"/>
+    </g>
+  </g>
+
+  <!-- Start -->
+  <g transform="translate(300, 118)">
+    <rect x="0" y="0" width="36" height="12" rx="6" fill="#3a3530" opacity="0.3"/>
+    <g data-action="start">
+      <rect x="0" y="0" width="36" height="12" rx="6" fill="#5a5550"/>
+      <rect x="2" y="1" width="32" height="4" rx="2" fill="#7a7570" opacity="0.25"/>
+    </g>
+  </g>
+
+  <!-- B -->
+  <g transform="translate(420, 108)">
+    <circle cx="22" cy="22" r="20" fill="#5a1530" opacity="0.2"/>
+    <g data-action="b">
+      <circle cx="22" cy="22" r="20" fill="#8b2252"/>
+      <circle cx="22" cy="22" r="18" fill="#5a1530" opacity="0.1"/>
+      <path d="M 8,12 A 18,18 0 0,1 36,12" fill="none" stroke="#b8356e" stroke-width="2.5" opacity="0.3" stroke-linecap="round"/>
+    </g>
+    <text x="22" y="50" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="7px" fill="#7a7874" opacity="0.5" text-anchor="middle" font-weight="600">B</text>
+  </g>
+
+  <!-- A -->
+  <g transform="translate(472, 108)">
+    <circle cx="22" cy="22" r="20" fill="#5a1530" opacity="0.2"/>
+    <g data-action="a">
+      <circle cx="22" cy="22" r="20" fill="#8b2252"/>
+      <circle cx="22" cy="22" r="18" fill="#5a1530" opacity="0.08"/>
+      <path d="M 8,12 A 18,18 0 0,1 36,12" fill="none" stroke="#b8356e" stroke-width="2.5" opacity="0.35" stroke-linecap="round"/>
+    </g>
+    <text x="22" y="50" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="7px" fill="#7a7874" opacity="0.5" text-anchor="middle" font-weight="600">A</text>
+  </g>
+
+  <!-- PCB traces -->
+  <line x1="238" y1="120" x2="238" y2="148" stroke="#4a1a6b" stroke-width="0.5" opacity="0.2"/>
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#4a1a6b" stroke-width="0.5" opacity="0.15"/>
+</svg>

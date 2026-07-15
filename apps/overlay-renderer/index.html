@@ -409,6 +409,97 @@ html, body {
     <!-- D-pad label -->
     <text x="150" y="197" class="label" font-size="7px" opacity="0.4">CONTROL PAD</text>
   </svg>
+
+  <!-- ═══ GBC THEME (Atomic Purple) ═══ -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 170" width="580" height="170" class="theme-gbc" style="display:none;max-width:100%;height:auto;">
+    <style>
+      .theme-gbc .dpad-body { fill: #3a3530; }
+      .theme-gbc .dpad-surface { fill: #4a4540; }
+      .theme-gbc .dpad-arrow { fill: #6e6860; }
+      .theme-gbc .dpad-shadow { fill: #2a2520; }
+      .theme-gbc .btn-a-body { fill: #8b2252; }
+      .theme-gbc .btn-a-highlight { stroke: #b8356e; }
+      .theme-gbc .btn-a-shadow { fill: #5a1530; }
+      .theme-gbc .btn-a-surface { fill: #a03060; }
+      .theme-gbc .btn-b-body { fill: #8b2252; }
+      .theme-gbc .btn-b-highlight { stroke: #b8356e; }
+      .theme-gbc .btn-b-shadow { fill: #5a1530; }
+      .theme-gbc .btn-b-surface { fill: #a03060; }
+      .theme-gbc .pill-body { fill: #5a5550; }
+      .theme-gbc .pill-highlight { fill: #7a7570; }
+      .theme-gbc .pill-surface { fill: #6a6560; }
+      .theme-gbc .btn-a-group.pressed .btn-a-body { fill: #5a1530; }
+      .theme-gbc .btn-b-group.pressed .btn-b-body { fill: #5a1530; }
+      .theme-gbc .pill-group.pressed .pill-body { fill: #3a3530; }
+    </style>
+
+    <!-- Shell — translucent purple with layered depth -->
+    <rect x="4" y="4" width="572" height="162" rx="18" fill="#7b3fa3" opacity="0.75"/>
+    <rect x="4" y="4" width="572" height="162" rx="18" fill="none" stroke="#9b5fc3" stroke-width="1" opacity="0.5"/>
+
+    <!-- Inner components visible through translucent shell -->
+    <rect x="24" y="14" width="200" height="100" rx="6" fill="#4a1a6b" opacity="0.3"/>
+    <rect x="260" y="14" width="296" height="100" rx="6" fill="#4a1a6b" opacity="0.15"/>
+
+    <!-- Screen area -->
+    <rect x="30" y="20" width="188" height="88" rx="4" fill="#2a1a3b" opacity="0.6"/>
+    <rect x="34" y="24" width="180" height="80" rx="3" fill="#1a0a2b" opacity="0.4"/>
+    <text x="124" y="68" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7px" font-weight="700" letter-spacing="1.5px" fill="#7b5fa3" opacity="0.4" text-anchor="middle">GAME BOY</text>
+    <text x="124" y="78" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="6px" font-weight="600" letter-spacing="1px" fill="#9b7fc3" opacity="0.3" text-anchor="middle">COLOR</text>
+
+    <!-- IR port bump (top edge) -->
+    <rect x="480" y="2" width="40" height="6" rx="3" fill="#6b3093" opacity="0.6"/>
+
+    <!-- ═══ D-PAD (compact, left) ═══ -->
+    <g transform="translate(60, 112)" class="btn-base">
+      <use href="#dpad-cross" class="dpad-shadow" transform="translate(1, 2)" opacity="0.3"/>
+      <g class="dpad-group btn-base" data-action="up"><use href="#dpad-cross" class="dpad-body"/></g>
+      <g class="dpad-group btn-base" data-action="down"><use href="#dpad-cross" class="dpad-body"/></g>
+      <g class="dpad-group btn-base" data-action="left"><use href="#dpad-cross" class="dpad-body"/></g>
+      <g class="dpad-group btn-base" data-action="right"><use href="#dpad-cross" class="dpad-body"/></g>
+      <circle cx="50" cy="50" r="10" fill="var(--dpad-bg)"/>
+    </g>
+
+    <!-- ═══ START + SELECT ═══ -->
+    <g transform="translate(250, 118)" class="btn-base">
+      <rect x="0" y="0" width="36" height="12" rx="6" fill="#3a3530" opacity="0.3" transform="translate(0, 2)"/>
+      <g class="pill-group btn-base" data-action="select">
+        <rect x="0" y="0" width="36" height="12" rx="6" class="pill-body"/>
+        <rect x="2" y="1" width="32" height="4" rx="2" class="pill-highlight" opacity="0.25"/>
+      </g>
+    </g>
+    <g transform="translate(300, 118)" class="btn-base">
+      <rect x="0" y="0" width="36" height="12" rx="6" fill="#3a3530" opacity="0.3" transform="translate(0, 2)"/>
+      <g class="pill-group btn-base" data-action="start">
+        <rect x="0" y="0" width="36" height="12" rx="6" class="pill-body"/>
+        <rect x="2" y="1" width="32" height="4" rx="2" class="pill-highlight" opacity="0.25"/>
+      </g>
+    </g>
+
+    <!-- ═══ B + A ═══ -->
+    <g transform="translate(420, 108)" class="btn-base">
+      <circle cx="22" cy="22" r="20" fill="#5a1530" opacity="0.2" transform="translate(0, 2)"/>
+      <g class="btn-b-group btn-base" data-action="b">
+        <circle cx="22" cy="22" r="20" class="btn-b-body"/>
+        <circle cx="22" cy="22" r="18" fill="#5a1530" opacity="0.1"/>
+        <path d="M 8,12 A 18,18 0 0,1 36,12" class="btn-b-highlight" opacity="0.3" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <text x="22" y="50" class="label" font-size="7px">B</text>
+    </g>
+    <g transform="translate(472, 108)" class="btn-base">
+      <circle cx="22" cy="22" r="20" fill="#5a1530" opacity="0.2" transform="translate(0, 2)"/>
+      <g class="btn-a-group btn-base" data-action="a">
+        <circle cx="22" cy="22" r="20" class="btn-a-body"/>
+        <circle cx="22" cy="22" r="18" fill="#5a1530" opacity="0.08"/>
+        <path d="M 8,12 A 18,18 0 0,1 36,12" class="btn-a-highlight" opacity="0.35" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <text x="22" y="50" class="label" font-size="7px">A</text>
+    </g>
+
+    <!-- Hidden internal PCB traces for translucent effect -->
+    <line x1="238" y1="120" x2="238" y2="148" stroke="#4a1a6b" stroke-width="0.5" opacity="0.2"/>
+    <line x1="400" y1="110" x2="400" y2="140" stroke="#4a1a6b" stroke-width="0.5" opacity="0.15"/>
+  </svg>
 </div>
 
 <div class="status" id="status">● connected</div>
