@@ -316,6 +316,7 @@ html, body {
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200" class="theme-dmg" style="display:none;max-width:100%;height:auto;">
     <style>
       /* DMG color overrides — warm gray shell, magenta buttons */
+      :root { --dpad-shadow: #2a2520; --btn-start-shadow: #3a3530; --label-color: #6a6864; }
       .theme-dmg .dpad-body { fill: #3a3530; }
       .theme-dmg .dpad-surface { fill: #4a4540; }
       .theme-dmg .dpad-arrow { fill: #6e6860; }
@@ -333,7 +334,11 @@ html, body {
       .theme-dmg .pill-surface { fill: #6a6560; }
       .theme-dmg .btn-a-group.pressed .btn-a-body { fill: #5a1530; }
       .theme-dmg .btn-b-group.pressed .btn-b-body { fill: #5a1530; }
+      .theme-dmg .btn-a-group.pressed .btn-a-surface { fill: #3a1030; }
+      .theme-dmg .btn-b-group.pressed .btn-b-surface { fill: #3a1030; }
       .theme-dmg .pill-group.pressed .pill-body { fill: #3a3530; }
+      .theme-dmg .pill-group.pressed .pill-surface { fill: #2a2520; }
+      .theme-dmg .label { fill: #6a6864; }
     </style>
 
     <!-- ═══ FACEPLATE — Classic DMG warm gray ═══ -->
@@ -370,7 +375,7 @@ html, body {
 
     <!-- ═══ START + SELECT (center, angled) ═══ -->
     <g transform="translate(255, 135)" class="btn-base">
-      <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" fill="#5a5550" opacity="0.3" transform="translate(0, 2) rotate(-25, 20, 6)"/>
+      <rect x="0" y="0" width="40" height="12" rx="6" fill="#5a5550" opacity="0.3" transform="translate(0, 2) rotate(-25, 20, 6)"/>
       <g class="pill-group btn-base" data-action="select">
         <rect x="0" y="0" width="40" height="12" rx="6" transform="rotate(-25, 20, 6)" class="pill-body"/>
         <rect x="2" y="1" width="36" height="5" rx="2.5" transform="rotate(-25, 20, 6)" class="pill-highlight" opacity="0.25"/>
@@ -383,6 +388,10 @@ html, body {
         <rect x="2" y="1" width="36" height="5" rx="2.5" transform="rotate(-25, 20, 6)" class="pill-highlight" opacity="0.25"/>
       </g>
     </g>
+
+    <!-- Select/Start labels -->
+    <text x="275" y="162" class="label" font-size="6px" opacity="0.35">SELECT</text>
+    <text x="340" y="162" class="label" font-size="6px" opacity="0.35">START</text>
 
     <!-- ═══ B + A (RIGHT) — classic magenta/maroon ═══ -->
     <g transform="translate(450, 128)" class="btn-base">
@@ -413,6 +422,7 @@ html, body {
   <!-- ═══ GBC THEME (Atomic Purple) ═══ -->
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 170" width="580" height="170" class="theme-gbc" style="display:none;max-width:100%;height:auto;">
     <style>
+      :root { --dpad-shadow: #2a2520; --btn-start-shadow: #3a3530; --label-color: #9b7fc3; }
       .theme-gbc .dpad-body { fill: #3a3530; }
       .theme-gbc .dpad-surface { fill: #4a4540; }
       .theme-gbc .dpad-arrow { fill: #6e6860; }
@@ -430,7 +440,11 @@ html, body {
       .theme-gbc .pill-surface { fill: #6a6560; }
       .theme-gbc .btn-a-group.pressed .btn-a-body { fill: #5a1530; }
       .theme-gbc .btn-b-group.pressed .btn-b-body { fill: #5a1530; }
+      .theme-gbc .btn-a-group.pressed .btn-a-surface { fill: #3a1030; }
+      .theme-gbc .btn-b-group.pressed .btn-b-surface { fill: #3a1030; }
       .theme-gbc .pill-group.pressed .pill-body { fill: #3a3530; }
+      .theme-gbc .pill-group.pressed .pill-surface { fill: #2a2520; }
+      .theme-gbc .label { fill: #9b7fc3; }
     </style>
 
     <!-- Shell — translucent purple with layered depth -->
@@ -475,6 +489,10 @@ html, body {
         <rect x="2" y="1" width="32" height="4" rx="2" class="pill-highlight" opacity="0.25"/>
       </g>
     </g>
+
+    <!-- Select/Start labels -->
+    <text x="268" y="140" class="label" font-size="6px" opacity="0.3">SELECT</text>
+    <text x="318" y="140" class="label" font-size="6px" opacity="0.3">START</text>
 
     <!-- ═══ B + A ═══ -->
     <g transform="translate(420, 108)" class="btn-base">
@@ -706,10 +724,21 @@ document.addEventListener('keyup', (e) => {
 // Theme selection via ?theme= URL param
 (function initTheme() {
   const themeName = urlParams.get('theme') || 'player-silver';
+  let found = false;
   document.querySelectorAll('svg[class^="theme-"]').forEach(svg => {
     const tc = [...svg.classList].find(c => c.startsWith('theme-'));
-    svg.style.display = tc === `theme-${themeName}` ? '' : 'none';
+    const match = tc === `theme-${themeName}`;
+    svg.style.display = match ? '' : 'none';
+    if (match) found = true;
   });
+  // Fallback to player-silver on invalid theme
+  if (!found && themeName !== 'player-silver') {
+    document.querySelectorAll('svg[class^="theme-"]').forEach(svg => {
+      const tc = [...svg.classList].find(c => c.startsWith('theme-'));
+      svg.style.display = tc === 'theme-player-silver' ? '' : 'none';
+    });
+    console.warn('GB Input Display: unknown theme "' + themeName + '", falling back to player-silver');
+  }
 })();
 
 connectWebSocket();
