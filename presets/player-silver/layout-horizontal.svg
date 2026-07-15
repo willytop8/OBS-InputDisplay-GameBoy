@@ -66,8 +66,7 @@
 
       /* ── Button base classes ── */
       .btn-base {
-        transition: transform var(--transition-speed) ease, filter var(--transition-speed) ease;
-        cursor: pointer;
+        transition: transform var(--press-speed) ease, filter var(--release-speed) ease;
       }
       .btn-base.pressed {
         transform: translateY(var(--press-y));

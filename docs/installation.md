@@ -5,7 +5,7 @@
 ## What You Need
 
 - OBS Studio 30.x or 31.x (Windows or Linux)
-- [Input Overlay plugin](https://github.com/univrsal/input-overlay/releases) v5.0.5+
+- [Input Overlay plugin](https://github.com/univrsal/input-overlay/releases) v5.0.5 (tested; newer versions may work but are unverified)
 - GB Input Display preset (this zip file)
 
 ## Quick Setup (5 minutes)

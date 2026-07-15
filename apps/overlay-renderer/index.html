@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 <title>GB Input Display</title>
 <style>
 /* === Reset & Base === */
@@ -42,7 +43,7 @@ html, body {
 <body>
 
 <div class="overlay" id="overlay">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200" style="max-width:100%;height:auto;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200" class="theme-player-silver" style="max-width:100%;height:auto;">
     <defs>
       <style>
         /* ── CSS Custom Properties (themeable) ── */
@@ -72,7 +73,9 @@ html, body {
           --label-color:        #7a7a72;
           --label-highlight:    #8f8f88;
           --press-y:            1.5px;
-          --transition-speed:   0.1s;
+          --press-speed:       0.05s;
+          --release-speed:     0.12s;
+          --transition-speed:  0.1s;
         }
 
         /* ── Faceplate body ── */
@@ -83,7 +86,7 @@ html, body {
 
         /* ── Button base ── */
         .btn-base {
-          transition: transform var(--transition-speed) ease, filter var(--transition-speed) ease;
+          transition: transform var(--press-speed) ease, filter var(--release-speed) ease;
         }
         .btn-base.pressed {
           transform: translateY(var(--press-y));
@@ -225,6 +228,77 @@ html, body {
     <!-- ═══ BRANDING ═══ -->
     <text x="570" y="148" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="7px" font-weight="400" letter-spacing="1px" fill="var(--faceplate-seam)" opacity="0.5" text-anchor="end" dominant-baseline="central">GB INPUT DISPLAY</text>
     <text x="570" y="156" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="6px" font-weight="300" letter-spacing="0.8px" fill="var(--faceplate-seam)" opacity="0.35" text-anchor="end" dominant-baseline="central">PLAYER SILVER</text>
+  </svg>
+
+  <!-- ═══ MINIMAL THEME (buttons only, no faceplate) ═══ -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 140" width="440" height="140" class="theme-minimal" style="display:none;max-width:100%;height:auto;">
+
+    <!-- ═══ D-PAD (LEFT) ═══ -->
+    <g transform="translate(30, 30)" class="btn-base">
+      <use href="#dpad-cross" class="dpad-shadow" transform="translate(1, 2)" opacity="0.35"/>
+
+      <g class="dpad-group btn-base" data-action="up">
+        <use href="#dpad-cross" class="dpad-body"/>
+      </g>
+      <g class="dpad-group btn-base" data-action="down">
+        <use href="#dpad-cross" class="dpad-body"/>
+      </g>
+      <g class="dpad-group btn-base" data-action="left">
+        <use href="#dpad-cross" class="dpad-body"/>
+      </g>
+      <g class="dpad-group btn-base" data-action="right">
+        <use href="#dpad-cross" class="dpad-body"/>
+      </g>
+
+      <circle cx="50" cy="50" r="12" fill="var(--dpad-bg)" stroke="var(--dpad-highlight)" stroke-width="0.5"/>
+      <circle cx="50" cy="50" r="10" fill="var(--dpad-surface)" opacity="0.6"/>
+      <rect x="30" y="39" width="40" height="22" rx="2" fill="var(--dpad-surface)" opacity="0.3"/>
+      <rect x="39" y="30" width="22" height="40" rx="2" fill="var(--dpad-surface)" opacity="0.3"/>
+      <polygon points="50,34 46,40 54,40" class="dpad-arrow" opacity="0.5"/>
+      <polygon points="50,66 46,60 54,60" class="dpad-arrow" opacity="0.5"/>
+      <polygon points="34,50 40,46 40,54" class="dpad-arrow" opacity="0.5"/>
+      <polygon points="66,50 60,46 60,54" class="dpad-arrow" opacity="0.5"/>
+    </g>
+
+    <!-- ═══ START + SELECT (CENTER) ═══ -->
+    <g transform="translate(195, 52)" class="btn-base">
+      <rect x="0" y="0" width="36" height="16" rx="8" fill="var(--btn-start-shadow)" opacity="0.3" transform="translate(0, 2)"/>
+      <g class="pill-group btn-base" data-action="start">
+        <rect x="0" y="0" width="36" height="16" rx="8" class="pill-body"/>
+        <rect x="2" y="1" width="32" height="6" rx="3" class="pill-highlight" opacity="0.3"/>
+        <rect x="3" y="3" width="30" height="4" rx="2" class="pill-surface" opacity="0.15"/>
+      </g>
+    </g>
+    <g transform="translate(195, 52)" class="btn-base">
+      <rect x="0" y="20" width="36" height="16" rx="8" fill="var(--btn-start-shadow)" opacity="0.3" transform="translate(0, 2)"/>
+      <g class="pill-group btn-base" data-action="select">
+        <rect x="0" y="20" width="36" height="16" rx="8" class="pill-body"/>
+        <rect x="2" y="21" width="32" height="6" rx="3" class="pill-highlight" opacity="0.3"/>
+        <rect x="3" y="23" width="30" height="4" rx="2" class="pill-surface" opacity="0.15"/>
+      </g>
+    </g>
+
+    <!-- ═══ B + A (RIGHT) ═══ -->
+    <g transform="translate(310, 30)" class="btn-base">
+      <circle cx="26" cy="26" r="22" fill="var(--btn-b-shadow)" opacity="0.2" transform="translate(0, 2)"/>
+      <g class="btn-b-group btn-base" data-action="b">
+        <circle cx="26" cy="26" r="22" class="btn-b-body"/>
+        <circle cx="26" cy="26" r="20" fill="var(--btn-b-shadow)" opacity="0.15"/>
+        <path d="M 10,14 A 20,20 0 0,1 42,14" class="btn-b-highlight" opacity="0.3" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="24" cy="20" rx="10" ry="6" class="btn-b-surface" opacity="0.12"/>
+        <circle cx="26" cy="26" r="14" fill="var(--btn-b-surface)" opacity="0.08"/>
+      </g>
+    </g>
+    <g transform="translate(370, 30)" class="btn-base">
+      <circle cx="26" cy="26" r="22" fill="var(--btn-a-shadow)" opacity="0.2" transform="translate(0, 2)"/>
+      <g class="btn-a-group btn-base" data-action="a">
+        <circle cx="26" cy="26" r="22" class="btn-a-body"/>
+        <circle cx="26" cy="26" r="20" fill="var(--btn-a-shadow)" opacity="0.12"/>
+        <path d="M 10,14 A 20,20 0 0,1 42,14" class="btn-a-highlight" opacity="0.35" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="24" cy="20" rx="10" ry="6" class="btn-a-surface" opacity="0.15"/>
+        <circle cx="26" cy="26" r="14" fill="var(--btn-a-surface)" opacity="0.08"/>
+      </g>
+    </g>
   </svg>
 </div>
 
@@ -429,6 +503,15 @@ document.addEventListener('keyup', (e) => {
 });
 
 // === Boot ===
+// Theme selection via ?theme= URL param
+(function initTheme() {
+  const themeName = urlParams.get('theme') || 'player-silver';
+  document.querySelectorAll('svg[class^="theme-"]').forEach(svg => {
+    const tc = [...svg.classList].find(c => c.startsWith('theme-'));
+    svg.style.display = tc === `theme-${themeName}` ? '' : 'none';
+  });
+})();
+
 connectWebSocket();
 
 // Show keyboard-only status if WebSocket doesn't connect within 5s
