@@ -111,6 +111,37 @@
 2. Optionally: disable WebSocket in Input Overlay Settings
 3. Delete the extracted folder
 
+## Custom Key Bindings
+
+You can override the default keyboard mapping without editing the source:
+
+```
+?keymap={"KeyCode":"action","KeyCode2":"action2"}
+```
+
+**Example** — remap to IJKL (movement) + Q/W (A/B) + Space (Start) + Shift (Select):
+
+```
+?keymap={"KeyI":"up","KeyK":"down","KeyJ":"left","KeyL":"right","KeyQ":"a","KeyW":"b","Space":"start","ShiftLeft":"select"}
+```
+
+**Full URL example in OBS Browser Source:**
+
+```
+file:///C:/path/to/gb-input-display/index.html?theme=dmg&keymap={"KeyI":"up","KeyK":"down","KeyJ":"left","KeyL":"right","KeyQ":"a","KeyW":"b","Space":"start","ShiftLeft":"select"}
+```
+
+**Valid action names:** `up`, `down`, `left`, `right`, `a`, `b`, `start`, `select`
+
+**Key code names:** Use the [KeyboardEvent.code](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values) values (e.g., `ArrowUp`, `KeyX`, `Space`, `ShiftLeft`, `Digit1`).
+
+**Multiple keys per action:** Just map multiple keys to the same action:
+```json
+{"ArrowUp":"up","KeyW":"up","Numpad8":"up"}
+```
+
+Note: OBS Browser Source may have issues with special characters in URLs. If the JSON doesn't parse, try URL-encoding the `keymap` value.
+
 ## Need Help?
 
 - [GitHub Issues](https://github.com/willytop8/Obs-InputDisplay-GameBoy/issues)

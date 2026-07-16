@@ -581,6 +581,38 @@ const KEY_MAP = {
   'ShiftRight': 'select', 'Backspace': 'select',
 };
 
+// === Custom Keymap Override (?keymap= URL param) ===
+// Usage: ?keymap={"ArrowUp":"up","KeyI":"up","KeyK":"down","KeyJ":"left","KeyL":"right","KeyQ":"a","KeyW":"b"}
+// Values must be valid GameBoyAction: up/down/left/right/a/b/start/select
+const VALID_ACTIONS = new Set(['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select']);
+
+(function loadKeymap() {
+  const raw = urlParams.get('keymap');
+  if (!raw) return;
+  try {
+    const overrides = JSON.parse(raw);
+    if (typeof overrides !== 'object' || Array.isArray(overrides)) {
+      console.warn('GB Input Display: keymap must be a JSON object, ignoring');
+      return;
+    }
+    let applied = 0;
+    for (const [key, action] of Object.entries(overrides)) {
+      if (typeof key !== 'string' || typeof action !== 'string') continue;
+      if (!VALID_ACTIONS.has(action)) {
+        console.warn('GB Input Display: unknown action "' + action + '" for key "' + key + '", skipping');
+        continue;
+      }
+      KEY_MAP[key] = action;
+      applied++;
+    }
+    if (applied > 0) {
+      console.log('GB Input Display: applied ' + applied + ' custom key bindings');
+    }
+  } catch (e) {
+    console.warn('GB Input Display: invalid keymap JSON, using defaults');
+  }
+})();
+
 // === Input Overlay WebSocket Client ===
 const urlParams = new URLSearchParams(window.location.search);
 const WS_URL = urlParams.get('ws') || 'ws://localhost:16899';
