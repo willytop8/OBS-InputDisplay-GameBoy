@@ -28,7 +28,6 @@ It works as an overlay in [OBS Studio](https://obsproject.com/) (the free stream
 |---|---|
 | **DMG** | Original gray Game Boy |
 | **GBC** | Atomic Purple Game Boy Color |
-| **GBA Glacier** | Translucent frost blue — GBA Glacier edition |
 | **Player Silver** | Clean silver & blue (default) |
 | **Minimal** | Buttons only, no console shell |
 
@@ -97,7 +96,6 @@ Add `?theme=` to the URL in your Browser Source settings:
 
 - `index.html?theme=dmg` — Original Game Boy gray
 - `index.html?theme=gbc` — Atomic Purple
-- `index.html?theme=gba-glacier` — GBA Glacier (translucent frost blue)
 - `index.html?theme=player-silver` — Silver & blue (default)
 - `index.html?theme=minimal` — Just the buttons
 
