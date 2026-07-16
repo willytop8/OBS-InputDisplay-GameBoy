@@ -144,5 +144,5 @@ Note: OBS Browser Source may have issues with special characters in URLs. If the
 
 ## Need Help?
 
-- [GitHub Issues](https://github.com/willytop8/Obs-InputDisplay-GameBoy/issues)
+- [GitHub Issues](https://github.com/willytop8/OBS-InputDisplay-GameBoy/issues)
 - Input Overlay plugin docs: [univrsal/input-overlay Wiki](https://github.com/univrsal/input-overlay/wiki/Usage)
