@@ -6,6 +6,51 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 <title>GB Input Display</title>
 <style>
+/* === Config Mode === */
+body.config-mode .overlay > svg { display: none; }
+.config-panel {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  display: none; /* Hidden by default */
+  padding: 20px;
+  overflow-y: auto;
+}
+body.config-mode .config-panel { display: flex; }
+.config-panel h2 { margin-bottom: 20px; }
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 300px;
+  margin-bottom: 10px;
+}
+.config-item button {
+  background: #444;
+  color: white;
+  border: 1px solid #666;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.config-item span {
+  width: 150px;
+  text-align: right;
+  font-family: monospace;
+}
+.config-buttons {
+  margin-top: 30px;
+}
+.config-buttons button {
+  margin: 0 10px;
+  padding: 8px 15px;
+  font-size: 14px;
+}
 /* === Reset & Base === */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
@@ -522,14 +567,44 @@ html, body {
 
 <div class="status" id="status">● connected</div>
 
+<div class="config-panel" id="configPanel">
+  <h2>Configure Game Boy Input Map</h2>
+  <div id="keymapConfigItems">
+    <!-- Config items will be injected here by JavaScript -->
+  </div>
+  <div class="config-buttons">
+    <button id="saveKeymap">Save Configuration</button>
+    <button id="resetKeymap">Reset to Defaults</button>
+    <button id="exitConfig">Exit Config Mode</button>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // GB Input Display — Browser Source Renderer v0.2
 // ============================================================
 
+// --- Constants ---
+const LOCAL_STORAGE_KEYMAP_KEY = 'gbInputKeymap';
+const CONFIG_MODE_PARAM = 'config';
+
 // Action state for GB buttons (l/r are GBA-only, hidden in GB theme)
 const ACTIONS = ['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select'];
 const state = Object.fromEntries(ACTIONS.map(a => [a, false]));
+
+// Default Keyboard Mapping
+const DEFAULT_KEY_MAP = {
+  'ArrowUp': 'up', 'KeyW': 'up',
+  'ArrowDown': 'down', 'KeyS': 'down',
+  'ArrowLeft': 'left', 'KeyA': 'left',
+  'ArrowRight': 'right', 'KeyD': 'right',
+  'KeyX': 'a', 'KeyZ': 'b',
+  'Enter': 'start',
+  'ShiftRight': 'select', 'Backspace': 'select',
+};
+
+// Current active keymap (mutable)
+let KEY_MAP = { ...DEFAULT_KEY_MAP };
 
 // === Status Indicator (persists when disconnected) ===
 const statusEl = document.getElementById('status');
@@ -570,33 +645,39 @@ function render() {
 }
 requestAnimationFrame(render);
 
-// === Keyboard Mapping ===
-const KEY_MAP = {
-  'ArrowUp': 'up', 'KeyW': 'up',
-  'ArrowDown': 'down', 'KeyS': 'down',
-  'ArrowLeft': 'left', 'KeyA': 'left',
-  'ArrowRight': 'right', 'KeyD': 'right',
-  'KeyX': 'a', 'KeyZ': 'b',
-  'Enter': 'start',
-  'ShiftRight': 'select', 'Backspace': 'select',
-};
-
 // === URL Parameters ===
 const urlParams = new URLSearchParams(window.location.search);
+const isInConfigMode = urlParams.get(CONFIG_MODE_PARAM) === 'true';
 
-// === Custom Keymap Override (?keymap= URL param) ===
-// Usage: ?keymap={"ArrowUp":"up","KeyI":"up","KeyK":"down","KeyJ":"left","KeyL":"right","KeyQ":"a","KeyW":"b"}
-// Values must be valid GameBoyAction: up/down/left/right/a/b/start/select
-const VALID_ACTIONS = new Set(['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select']);
+// === Custom Keymap Loading Logic ===
+const VALID_ACTIONS = new Set(ACTIONS);
 
-(function loadKeymap() {
+function loadKeymapFromStorage() {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEYMAP_KEY);
+    if (raw) {
+      const storedKeymap = JSON.parse(raw);
+      if (typeof storedKeymap === 'object' && !Array.isArray(storedKeymap)) {
+        Object.assign(KEY_MAP, storedKeymap);
+        console.log('GB Input Display: Loaded keymap from localStorage.');
+        return true;
+      }
+    }
+  } catch (e) {
+    console.warn('GB Input Display: Invalid keymap in localStorage, using defaults.', e);
+    localStorage.removeItem(LOCAL_STORAGE_KEYMAP_KEY); // Clear bad data
+  }
+  return false;
+}
+
+function loadKeymapFromUrl() {
   const raw = urlParams.get('keymap');
-  if (!raw) return;
+  if (!raw) return false;
   try {
     const overrides = JSON.parse(raw);
     if (typeof overrides !== 'object' || Array.isArray(overrides)) {
       console.warn('GB Input Display: keymap must be a JSON object, ignoring');
-      return;
+      return false;
     }
     let applied = 0;
     for (const [key, action] of Object.entries(overrides)) {
@@ -609,12 +690,155 @@ const VALID_ACTIONS = new Set(['up', 'down', 'left', 'right', 'a', 'b', 'start',
       applied++;
     }
     if (applied > 0) {
-      console.log('GB Input Display: applied ' + applied + ' custom key bindings');
+      console.log('GB Input Display: applied ' + applied + ' custom key bindings from URL');
     }
+    return true;
   } catch (e) {
-    console.warn('GB Input Display: invalid keymap JSON, using defaults');
+    console.warn('GB Input Display: invalid keymap JSON from URL, using existing keymap (or defaults)');
+  }
+  return false;
+}
+
+// Load keymap: localStorage -> URL param -> default
+(function initializeKeymap() {
+  // Always start with defaults
+  KEY_MAP = { ...DEFAULT_KEY_MAP };
+  if (!loadKeymapFromStorage()) {
+    loadKeymapFromUrl(); // Only try URL if localStorage failed or was empty
   }
 })();
+
+// === Config Mode UI Logic ===
+const configPanel = document.getElementById('configPanel');
+const keymapConfigItems = document.getElementById('keymapConfigItems');
+const saveKeymapBtn = document.getElementById('saveKeymap');
+const resetKeymapBtn = document.getElementById('resetKeymap');
+const exitConfigBtn = document.getElementById('exitConfig');
+
+let currentlyMappingAction = null; // The action currently being mapped (e.g., 'up')
+
+function renderConfigItems() {
+  keymapConfigItems.innerHTML = ''; // Clear existing items
+  // Create a reverse map for display (action -> list of keys)
+  const currentKeyMapReversed = Object.entries(KEY_MAP).reduce((acc, [key, action]) => {
+    if (!acc[action]) acc[action] = [];
+    acc[action].push(key);
+    return acc;
+  }, {});
+
+  ACTIONS.forEach(action => {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('config-item');
+    itemDiv.innerHTML = `
+      <span>${action.charAt(0).toUpperCase() + action.slice(1)}:</span>
+      <span id="key-${action}">${currentKeyMapReversed[action] ? currentKeyMapReversed[action].join(', ') : 'Unassigned'}</span>
+      <button data-action="${action}">Map Key</button>
+    `;
+    keymapConfigItems.appendChild(itemDiv);
+  });
+
+  // Attach event listeners to new buttons
+  keymapConfigItems.querySelectorAll('button').forEach(button => {
+    button.onclick = (e) => startMapping(e.target.dataset.action);
+  });
+}
+
+function startMapping(action) {
+  currentlyMappingAction = action;
+  setStatus(`Press a key for ${action.toUpperCase()}...`, false, true);
+  // Highlight the current action's display
+  keymapConfigItems.querySelectorAll('.config-item span').forEach(span => {
+    if (span.id === `key-${action}`) {
+      span.style.color = 'yellow';
+    } else {
+      span.style.color = '';
+    }
+  });
+
+  // Temporarily disable other map buttons
+  keymapConfigItems.querySelectorAll('button').forEach(btn => btn.disabled = true);
+}
+
+function stopMapping(newKey = null) {
+  if (currentlyMappingAction && newKey) {
+    // Remove old mappings for this action
+    for (const key in KEY_MAP) {
+      if (KEY_MAP[key] === currentlyMappingAction) {
+        delete KEY_MAP[key];
+      }
+    }
+    // Remove this key if it was mapped to another action
+    for (const existingKey in KEY_MAP) {
+        if (existingKey === newKey) {
+            delete KEY_MAP[existingKey];
+        }
+    }
+    KEY_MAP[newKey] = currentlyMappingAction;
+    renderConfigItems(); // Re-render to show updated key
+    setStatus(`Key for ${currentlyMappingAction.toUpperCase()} set to ${newKey}.`, false, false);
+  } else if (currentlyMappingAction) {
+    setStatus('Mapping cancelled.', false, false);
+  }
+  currentlyMappingAction = null;
+  // Restore button states
+  keymapConfigItems.querySelectorAll('button').forEach(btn => btn.disabled = false);
+  // Remove highlight
+  keymapConfigItems.querySelectorAll('.config-item span').forEach(span => {
+    span.style.color = '';
+  });
+}
+
+
+function saveKeymap() {
+  localStorage.setItem(LOCAL_STORAGE_KEYMAP_KEY, JSON.stringify(KEY_MAP));
+  setStatus('Keymap saved to browser storage!', false, false);
+  console.log('Saved Keymap:', KEY_MAP);
+}
+
+function resetKeymap() {
+  if (confirm('Are you sure you want to reset all key mappings to defaults?')) {
+    KEY_MAP = { ...DEFAULT_KEY_MAP };
+    localStorage.removeItem(LOCAL_STORAGE_KEYMAP_KEY);
+    renderConfigItems();
+    setStatus('Keymap reset to defaults!', false, false);
+  }
+}
+
+function exitConfigMode() {
+  // Redirect to URL without config param, or just reload
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete(CONFIG_MODE_PARAM);
+  window.location.href = newUrl.toString();
+}
+
+if (isInConfigMode) {
+  document.body.classList.add('config-mode');
+  // Hide the status indicator in config mode, it's replaced by config messages
+  statusEl.style.display = 'none';
+  configPanel.style.display = 'flex'; // Make sure config panel is visible
+  renderConfigItems();
+
+  saveKeymapBtn.onclick = saveKeymap;
+  resetKeymapBtn.onclick = resetKeymap;
+  exitConfigBtn.onclick = exitConfigMode;
+
+  // Prevent default keyboard events in config mode for mapping
+  document.addEventListener('keydown', (e) => {
+    if (currentlyMappingAction) {
+      e.preventDefault();
+      e.stopPropagation();
+      stopMapping(e.code);
+    }
+  }, true); // Use capture phase to intercept before other handlers
+
+  document.addEventListener('keyup', (e) => {
+    if (currentlyMappingAction) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+}
+
 
 // === Input Overlay WebSocket Client ===
 const WS_URL = urlParams.get('ws') || 'ws://localhost:16899';
@@ -677,6 +901,9 @@ function scheduleReconnect() {
 
 // === Input Overlay Message Handler ===
 function handleIOMessage(msg) {
+  // In config mode, we don't process game input
+  if (isInConfigMode) return;
+
   if (msg.keyboard && msg.keys) {
     handleKeyboardState(msg.keys);
   } else if (msg.gamepad !== undefined && msg.buttons) {
@@ -733,6 +960,8 @@ function handleGamepadState(buttons, axes, dpad) {
 }
 
 function handleKeyEvent(msg) {
+  // In config mode, we don't process game input
+  if (isInConfigMode) return;
   const action = KEY_MAP[msg.code];
   if (action) state[action] = msg.state === 'down' || msg.pressed === true;
 }
@@ -741,15 +970,15 @@ function clearAllInputs() {
   for (const k of Object.keys(state)) state[k] = false;
 }
 
-// === Keyboard Fallback (only when WebSocket is NOT connected) ===
+// === Keyboard Fallback (only when WebSocket is NOT connected and not in config mode) ===
 document.addEventListener('keydown', (e) => {
-  if (wsConnected) return;
+  if (wsConnected || isInConfigMode) return;
   const action = KEY_MAP[e.code];
   if (action) { e.preventDefault(); state[action] = true; }
 });
 
 document.addEventListener('keyup', (e) => {
-  if (wsConnected) return;
+  if (wsConnected || isInConfigMode) return;
   const action = KEY_MAP[e.code];
   if (action) { e.preventDefault(); state[action] = false; }
 });
@@ -775,14 +1004,17 @@ document.addEventListener('keyup', (e) => {
   }
 })();
 
-connectWebSocket();
+// Only connect WebSocket if not in config mode
+if (!isInConfigMode) {
+  connectWebSocket();
 
-// Show keyboard-only status if WebSocket doesn't connect within 5s
-setTimeout(() => {
-  if (!wsConnected && reconnectAttempts === 0) {
-    setStatus('no WebSocket — keyboard only', true, true);
-  }
-}, 5000);
+  // Show keyboard-only status if WebSocket doesn't connect within 5s
+  setTimeout(() => {
+    if (!wsConnected && reconnectAttempts === 0) {
+      setStatus('no WebSocket — keyboard only', true, true);
+    }
+  }, 5000);
+}
 </script>
 </body>
 </html>
