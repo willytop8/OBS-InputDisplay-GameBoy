@@ -581,6 +581,9 @@ const KEY_MAP = {
   'ShiftRight': 'select', 'Backspace': 'select',
 };
 
+// === URL Parameters ===
+const urlParams = new URLSearchParams(window.location.search);
+
 // === Custom Keymap Override (?keymap= URL param) ===
 // Usage: ?keymap={"ArrowUp":"up","KeyI":"up","KeyK":"down","KeyJ":"left","KeyL":"right","KeyQ":"a","KeyW":"b"}
 // Values must be valid GameBoyAction: up/down/left/right/a/b/start/select
@@ -614,7 +617,6 @@ const VALID_ACTIONS = new Set(['up', 'down', 'left', 'right', 'a', 'b', 'start',
 })();
 
 // === Input Overlay WebSocket Client ===
-const urlParams = new URLSearchParams(window.location.search);
 const WS_URL = urlParams.get('ws') || 'ws://localhost:16899';
 let ws = null;
 let wsReconnectTimer = null;
