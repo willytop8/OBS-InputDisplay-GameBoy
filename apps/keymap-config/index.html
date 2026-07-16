@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GB Input Display — Keymap Config</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 560px; width: 100%; }
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #93bce0;
+    margin-bottom: 0.3rem;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    color: #7a8590;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Preset buttons */
+  .presets {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .preset-btn {
+    background: #2a2a3e;
+    border: 1px solid #3a3a5e;
+    color: #b0b0c0;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .preset-btn:hover { background: #3a3a5e; border-color: #5a5a8e; }
+  .preset-btn.active { background: #3a4a6e; border-color: #6b9cc7; color: #93bce0; }
+
+  /* Key bind rows */
+  .bindings { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+
+  .bind-row {
+    display: flex;
+    align-items: center;
+    background: #22223a;
+    border: 1px solid #2a2a4e;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    transition: border-color 0.15s;
+  }
+  .bind-row.listening {
+    border-color: #d06080;
+    box-shadow: 0 0 8px rgba(208, 96, 128, 0.3);
+  }
+
+  .gb-label {
+    width: 100px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .gb-label.up    { color: #8bb8e0; }
+  .gb-label.down  { color: #8bb8e0; }
+  .gb-label.left  { color: #8bb8e0; }
+  .gb-label.right { color: #8bb8e0; }
+  .gb-label.a     { color: #d07088; }
+  .gb-label.b     { color: #c05070; }
+  .gb-label.start { color: #9a9aa0; }
+  .gb-label.select{ color: #9a9aa0; }
+
+  .key-slot {
+    flex: 1;
+    background: #16162a;
+    border: 1px dashed #3a3a5e;
+    border-radius: 6px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+    color: #7a8590;
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+    transition: all 0.15s;
+    min-width: 80px;
+  }
+  .key-slot:hover { border-color: #5a5a8e; color: #a0a0b0; }
+  .key-slot.mapped { border-style: solid; color: #e0e0e0; border-color: #4a5a8e; }
+  .key-slot.listening { border-color: #d06080; color: #d06080; border-style: solid; }
+
+  /* URL output */
+  .url-section { margin-bottom: 1.5rem; }
+  .url-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7a8590;
+    margin-bottom: 0.3rem;
+  }
+  .url-box {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .url-output {
+    flex: 1;
+    background: #0f0f1a;
+    border: 1px solid #2a2a4e;
+    border-radius: 6px;
+    padding: 0.6rem 0.8rem;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #93bce0;
+    word-break: break-all;
+  }
+  .copy-btn {
+    background: #3a4a6e;
+    border: none;
+    color: #93bce0;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: #4a5a8e; }
+  .copy-btn.copied { background: #2a6a4a; color: #8be0a0; }
+
+  .note {
+    font-size: 0.7rem;
+    color: #5a5a7a;
+    margin-top: 1.5rem;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Keymap Config</h1>
+  <p class="subtitle">Click a key slot, then press the key you want on your keyboard.</p>
+
+  <div class="presets">
+    <button class="preset-btn active" data-preset="arrows">Arrow Keys + Z/X</button>
+    <button class="preset-btn" data-preset="wasd">WASD + Q/E</button>
+    <button class="preset-btn" data-preset="ijkl">IJKL + U/O</button>
+    <button class="preset-btn" data-preset="numpad">Numpad 8456 + 1/2</button>
+  </div>
+
+  <div class="bindings">
+    <div class="bind-row" data-gb="up">
+      <span class="gb-label up">▲ D-pad Up</span>
+      <div class="key-slot" data-gb="up">ArrowUp</div>
+    </div>
+    <div class="bind-row" data-gb="down">
+      <span class="gb-label down">▼ D-pad Down</span>
+      <div class="key-slot" data-gb="down">ArrowDown</div>
+    </div>
+    <div class="bind-row" data-gb="left">
+      <span class="gb-label left">◀ D-pad Left</span>
+      <div class="key-slot" data-gb="left">ArrowLeft</div>
+    </div>
+    <div class="bind-row" data-gb="right">
+      <span class="gb-label right">▶ D-pad Right</span>
+      <div class="key-slot" data-gb="right">ArrowRight</div>
+    </div>
+    <div class="bind-row" data-gb="a">
+      <span class="gb-label a">● A</span>
+      <div class="key-slot" data-gb="a">KeyX</div>
+    </div>
+    <div class="bind-row" data-gb="b">
+      <span class="gb-label b">● B</span>
+      <div class="key-slot" data-gb="b">KeyZ</div>
+    </div>
+    <div class="bind-row" data-gb="start">
+      <span class="gb-label start">▶ Start</span>
+      <div class="key-slot" data-gb="start">Enter</div>
+    </div>
+    <div class="bind-row" data-gb="select">
+      <span class="gb-label select">▶ Select</span>
+      <div class="key-slot" data-gb="select">ShiftRight</div>
+    </div>
+  </div>
+
+  <div class="url-section">
+    <div class="url-label">Paste this URL into your OBS Browser Source</div>
+    <div class="url-box">
+      <div class="url-output" id="urlOutput">index.html</div>
+      <button class="copy-btn" id="copyBtn">Copy</button>
+    </div>
+  </div>
+
+  <p class="note">
+    After copying, paste this entire URL into OBS → Browser Source → URL field.<br>
+    You can also add a theme: <code>?theme=gbc&keymap=...</code>
+  </p>
+</div>
+
+<script>
+const PRESETS = {
+  arrows:   { up: 'ArrowUp',    down: 'ArrowDown',  left: 'ArrowLeft',  right: 'ArrowRight',  a: 'KeyX',   b: 'KeyZ',   start: 'Enter',     select: 'ShiftRight' },
+  wasd:     { up: 'KeyW',       down: 'KeyS',       left: 'KeyA',       right: 'KeyD',         a: 'KeyQ',   b: 'KeyE',   start: 'Enter',     select: 'ShiftRight' },
+  ijkl:     { up: 'KeyI',       down: 'KeyK',       left: 'KeyJ',       right: 'KeyL',         a: 'KeyU',   b: 'KeyO',   start: 'Enter',     select: 'ShiftRight' },
+  numpad:   { up: 'Numpad8',    down: 'Numpad5',    left: 'Numpad4',    right: 'Numpad6',      a: 'Numpad1',b: 'Numpad2',start: 'NumpadEnter', select: 'Numpad0' },
+};
+
+const NICE_NAMES = {
+  'ArrowUp': '↑', 'ArrowDown': '↓', 'ArrowLeft': '←', 'ArrowRight': '→',
+  'ShiftRight': 'RShift', 'ShiftLeft': 'LShift',
+  'ControlRight': 'RCtrl', 'ControlLeft': 'LCtrl',
+  'AltRight': 'RAlt', 'AltLeft': 'LAlt',
+  'NumpadEnter': 'NumEnter', 'Numpad0': 'Num0', 'Numpad1': 'Num1',
+  'Numpad2': 'Num2', 'Numpad4': 'Num4', 'Numpad5': 'Num5',
+  'Numpad6': 'Num6', 'Numpad8': 'Num8',
+};
+
+let keymap = { ...PRESETS.arrows };
+let listening = null; // which gb action is waiting for a keypress
+
+function niceName(code) {
+  return NICE_NAMES[code] || code.replace(/^(Key|Digit|Numpad)/, '');
+}
+
+function renderAll() {
+  for (const [gb, code] of Object.entries(keymap)) {
+    const slot = document.querySelector(`.key-slot[data-gb="${gb}"]`);
+    if (slot) {
+      slot.textContent = niceName(code);
+      slot.classList.add('mapped');
+      if (listening === gb) {
+        slot.classList.add('listening');
+        slot.textContent = 'press a key...';
+      } else {
+        slot.classList.remove('listening');
+      }
+    }
+    // row highlight
+    const row = document.querySelector(`.bind-row[data-gb="${gb}"]`);
+    if (row) {
+      row.classList.toggle('listening', listening === gb);
+    }
+  }
+  updateURL();
+}
+
+function updateURL() {
+  // Only include non-default keys for the current preset to keep URLs short
+  const activePreset = document.querySelector('.preset-btn.active')?.dataset.preset || 'arrows';
+  const defaults = PRESETS[activePreset];
+
+  // Build keymap JSON — only include keys that differ from the preset defaults
+  const overrides = {};
+  for (const [gb, code] of Object.entries(keymap)) {
+    if (defaults[gb] !== code) {
+      overrides[code] = gb;
+    }
+  }
+
+  let url = 'index.html';
+  if (Object.keys(overrides).length > 0) {
+    // Use reverse mapping (key → action) for the URL param
+    url += '?keymap=' + encodeURIComponent(JSON.stringify(overrides));
+  }
+  document.getElementById('urlOutput').textContent = url;
+}
+
+// Click a key slot to start listening
+document.querySelectorAll('.key-slot').forEach(slot => {
+  slot.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const gb = slot.dataset.gb;
+    if (listening === gb) {
+      listening = null; // cancel
+    } else {
+      listening = gb;
+    }
+    renderAll();
+  });
+});
+
+// Click anywhere else to cancel listening
+document.addEventListener('click', () => {
+  if (listening) {
+    listening = null;
+    renderAll();
+  }
+});
+
+// Capture keypress when listening
+document.addEventListener('keydown', (e) => {
+  if (!listening) return;
+  e.preventDefault();
+  e.stopPropagation();
+
+  // Map the pressed key
+  keymap[listening] = e.code;
+
+  // Move to next slot
+  const order = ['up', 'down', 'left', 'right', 'a', 'b', 'start', 'select'];
+  const idx = order.indexOf(listening);
+  listening = idx < order.length - 1 ? order[idx + 1] : null;
+
+  renderAll();
+});
+
+// Preset buttons
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const preset = btn.dataset.preset;
+    keymap = { ...PRESETS[preset] };
+    listening = null;
+    renderAll();
+  });
+});
+
+// Copy button
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const url = document.getElementById('urlOutput').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+});
+
+// Init
+renderAll();
+</script>
+</body>
+</html>

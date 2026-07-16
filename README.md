@@ -92,12 +92,24 @@ On Linux with Wayland, it works but may need extra setup. See the [installation 
 
 ## Changing the Theme
 
-Add `?theme=` to the URL in your Browser Source settings:
+Use `?theme=` to the URL in your Browser Source settings:
 
 - `index.html?theme=dmg` — Original Game Boy gray
 - `index.html?theme=gbc` — Atomic Purple
 - `index.html?theme=player-silver` — Silver & blue (default)
 - `index.html?theme=minimal` — Just the buttons
+
+---
+
+## Customizing Your Controls
+
+**The easy way:** Open [`apps/keymap-config/index.html`](apps/keymap-config/index.html) in your browser. Click each button slot, press the key you want, and copy the URL it generates. Four presets included (Arrow keys, WASD, IJKL, Numpad).
+
+**The manual way:** Add `?keymap=` to your URL with a JSON object mapping keyboard codes to Game Boy actions:
+
+```
+?keymap={"KeyQ":"a","KeyW":"b","KeyI":"up","KeyK":"down"}
+```
 
 ---
 
