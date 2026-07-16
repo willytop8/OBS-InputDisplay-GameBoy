@@ -130,6 +130,6 @@ Use `?theme=` to the URL in your Browser Source settings:
 
 ## License
 
-Code: MIT · Artwork: CC-BY 4.0
+Code: MIT 
 
 *Not affiliated with Nintendo. Game Boy is a trademark of Nintendo Co., Ltd.*
